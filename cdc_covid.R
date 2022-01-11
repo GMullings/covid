@@ -5,3 +5,7 @@ dataset <- read.csv(filename)
 dim(dataset)
 sapply(dataset, class)
 levels(dataset$outcome)
+levels(dataset$Age.group)
+allagesvaxtypes = dataset[dataset$Vaccine.product == "all_types" & dataset$Age.group == "all_ages_adj",]
+
+sum(is.na.data.frame(dataset))
