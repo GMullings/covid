@@ -44,9 +44,26 @@ unvaxdeathratepercent = as.data.frame(unvaxdeathratepercent)
 colnames(unvaxdeathratepercent) = "UnVaccinated.death.percent"
 vaxdeathratepercent = as.data.frame(vaxdeathratepercent)
 colnames(vaxdeathratepercent) = "Vaccinated.death.percent"
+caserate = cbind.data.frame(caserate, unvaxcaseratepercent, vaxcaseratepercent)
+deathsrate = cbind.data.frame(deathsrate, unvaxdeathratepercent, vaxdeathratepercent)
 
+dim(caserate)
+dim(deathsrate)
 
-# Perhaps calculate per 100k rate?
+snippedcaserate = head(caserate, -3)
+unvaxcasefatalityratio = deathsrate[8]/snippedcaserate[8]
+vaxcasefatalityratio = deathsrate[6]/snippedcaserate[6]
+colnames(unvaxcasefatalityratio) = "Unvaccinated"
+colnames(vaxcasefatalityratio) = "Vaccinated"
+casefatalityratios = cbind.data.frame(unvaxcasefatalityratio, vaxcasefatalityratio)
+casefatalityratios = cbind.data.frame(snippedcaserate[2:5],casefatalityratios)
+
+deathshundredk = deathsrate[17:18]*100000
+colnames(deathshundredk) = c("Unvaccinated","Vaccinated")
+deathshundredk = cbind.data.frame(deathsrate[2:5], deathshundredk)
+
+# Need to segment out below and above 50 age.
+# Are vaccinated and unvaccinated statistically different on deaths per 100k and case fatality ratios?
 
 # Need to plot case and death rates over time
 
