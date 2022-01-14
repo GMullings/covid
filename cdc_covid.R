@@ -58,10 +58,12 @@ colnames(unvaxcasefatalityratio) = "Unvaccinated"
 colnames(vaxcasefatalityratio) = "Vaccinated"
 casefatalityratios = cbind.data.frame(unvaxcasefatalityratio, vaxcasefatalityratio)
 casefatalityratios = cbind.data.frame(snippedcaserate[2:5],casefatalityratios)
+casefatalityratios = casefatalityratios[,-4]
 
 deathshundredk = deathsrate[17:18]*100000
 colnames(deathshundredk) = c("Unvaccinated","Vaccinated")
 deathshundredk = cbind.data.frame(deathsrate[2:5], deathshundredk)
+deathshundredk = deathshundredk[,-4]
 
 # Teens, 12-17
 teensvaxtypes = dataset[dataset$Vaccine.product == "all_types" & dataset$Age.group == "12-17",]
@@ -285,8 +287,107 @@ eoldeathshundredk = eoldeathsrate[17:18]*100000
 colnames(eoldeathshundredk) = c("Unvaccinated","Vaccinated")
 eoldeathshundredk = cbind.data.frame(eoldeathsrate[2:5], eoldeathshundredk)
 
+# Janssen All Ages
+allagesjajvax = dataset[dataset$Vaccine.product == "Janssen" & dataset$Age.group == "all_ages_adj",]
+jajdeaths = allagesjajvax[allagesjajvax$outcome == "death",]
+jajcases = allagesjajvax[allagesjajvax$outcome == "case",]
 
-# Need to segment out below and above 50 age.
+sum(is.na.data.frame(jajcases))
+sum(is.na.data.frame(jajdeaths))
+
+colnames(jajdeaths)
+jajvaxdeathrate = jajdeaths[6]/jajdeaths[7]
+colnames(jajvaxdeathrate) = "Janssen.death.rate"
+colnames(jajcases)
+jajvaxcaserate = jajcases[6]/jajcases[7]
+colnames(jajvaxcaserate) = "Janssen.case.rate"
+
+jajvaxcaseratepercent = percent(jajvaxcaserate$Janssen.case.rate)
+jajvaxdeathratepercent = percent(jajvaxdeathrate$Janssen.death.rate)
+
+jajvaxcaseratepercent = as.data.frame(jajvaxcaseratepercent)
+colnames(jajvaxcaseratepercent) = "Janssen.case.percent"
+jajvaxdeathratepercent = as.data.frame(jajvaxdeathratepercent)
+colnames(jajvaxdeathratepercent) = "Janssen.death.percent"
+
+dim(jajvaxcaserate)
+dim(jajvaxdeathrate)
+
+snippedjajvaxcaserate = head(jajvaxcaserate, -3)
+jajcasefatalityratio = jajvaxdeathrate/snippedjajvaxcaserate
+colnames(jajcasefatalityratio) = "Janssen"
+
+jajdeathshundredk = jajvaxdeathrate*100000
+
+# Moderna All Ages
+allagesmdrnavax = dataset[dataset$Vaccine.product == "Moderna" & dataset$Age.group == "all_ages_adj",]
+mdrnadeaths = allagesmdrnavax[allagesmdrnavax$outcome == "death",]
+mdrnacases = allagesmdrnavax[allagesmdrnavax$outcome == "case",]
+
+sum(is.na.data.frame(mdrnacases))
+sum(is.na.data.frame(mdrnadeaths))
+
+colnames(mdrnadeaths)
+mdrnavaxdeathrate = mdrnadeaths[6]/mdrnadeaths[7]
+colnames(mdrnavaxdeathrate) = "Moderna.death.rate"
+colnames(mdrnacases)
+mdrnavaxcaserate = mdrnacases[6]/mdrnacases[7]
+colnames(mdrnavaxcaserate) = "Moderna.case.rate"
+
+mdrnavaxcaseratepercent = percent(mdrnavaxcaserate$Moderna.case.rate)
+mdrnavaxdeathratepercent = percent(mdrnavaxdeathrate$Moderna.death.rate)
+
+mdrnavaxcaseratepercent = as.data.frame(mdrnavaxcaseratepercent)
+colnames(mdrnavaxcaseratepercent) = "Moderna.case.percent"
+mdrnavaxdeathratepercent = as.data.frame(mdrnavaxdeathratepercent)
+colnames(mdrnavaxdeathratepercent) = "Moderna.death.percent"
+
+dim(mdrnavaxcaserate)
+dim(mdrnavaxdeathrate)
+
+snippedmdrnavaxcaserate = head(mdrnavaxcaserate, -3)
+mdrnacasefatalityratio = mdrnavaxdeathrate/snippedmdrnavaxcaserate
+colnames(mdrnacasefatalityratio) = "Moderna"
+
+mdrnadeathshundredk = mdrnavaxdeathrate*100000
+
+# Pfizer All Ages
+allagespfzrvax = dataset[dataset$Vaccine.product == "Pfizer" & dataset$Age.group == "all_ages_adj",]
+pfzrdeaths = allagespfzrvax[allagespfzrvax$outcome == "death",]
+pfzrcases = allagespfzrvax[allagespfzrvax$outcome == "case",]
+
+sum(is.na.data.frame(pfzrcases))
+sum(is.na.data.frame(pfzrdeaths))
+
+colnames(pfzrdeaths)
+pfzrvaxdeathrate = pfzrdeaths[6]/pfzrdeaths[7]
+colnames(pfzrvaxdeathrate) = "Pfizer.death.rate"
+colnames(pfzrcases)
+pfzrvaxcaserate = pfzrcases[6]/pfzrcases[7]
+colnames(pfzrvaxcaserate) = "Pfizer.case.rate"
+
+pfzrvaxcaseratepercent = percent(pfzrvaxcaserate$Pfizer.case.rate)
+pfzrvaxdeathratepercent = percent(pfzrvaxdeathrate$Pfizer.death.rate)
+
+pfzrvaxcaseratepercent = as.data.frame(pfzrvaxcaseratepercent)
+colnames(pfzrvaxcaseratepercent) = "Pfizer.case.percent"
+pfzrvaxdeathratepercent = as.data.frame(pfzrvaxdeathratepercent)
+colnames(pfzrvaxdeathratepercent) = "Pfizer.death.percent"
+
+dim(pfzrvaxcaserate)
+dim(pfzrvaxdeathrate)
+
+snippedpfzrvaxcaserate = head(pfzrvaxcaserate, -3)
+pfzrcasefatalityratio = pfzrvaxdeathrate/snippedpfzrvaxcaserate
+colnames(pfzrcasefatalityratio) = "Pfizer"
+
+pfzrdeathshundredk = pfzrvaxdeathrate*100000
+
+# Combining vaccinated deaths per 100ks for all ages
+deathshundredk = cbind.data.frame(deathshundredk,jajdeathshundredk,mdrnadeathshundredk,pfzrdeathshundredk)
+
+
+# Are the case fatality ratios stable between vaccine types?
 # Are vaccinated and unvaccinated statistically different on deaths per 100k and case fatality ratios?
 # Are the deaths per 100k or the case fatality ratios stable across age groups within vaccinated vs unvaccinated?
 
