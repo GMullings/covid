@@ -1,7 +1,9 @@
 setwd("~/R/covid")
 .libPaths(c("C:/Users/geoff/Documents/R/win-library/3.6"))
 install.packages("scales")
+install.packages("ggpubr")
 library("scales")
+library("ggpubr")
 
 filename <- "Rates_of_COVID-19_Cases_or_Deaths_by_Age_Group_and_Vaccination_Status.csv"
 dataset <- read.csv(filename)
@@ -387,6 +389,9 @@ pfzrdeathshundredk = pfzrvaxdeathrate*100000
 deathshundredk = cbind.data.frame(deathshundredk,jajdeathshundredk,mdrnadeathshundredk,pfzrdeathshundredk)
 casefatalityratios = cbind.data.frame(casefatalityratios, jajcasefatalityratio, mdrnacasefatalityratio, pfzrcasefatalityratio)
 
+datasetcases = dataset[dataset$outcome == "case",]
+datasetdeaths = dataset[dataset$outcome == "death",]
+
 datasetcasefatalityratio = cbind.data.frame(head(datasetcases, -30),datasetdeaths[,6:9])
 datasetcasefatalityratio = datasetcasefatalityratio[,-18]
 datasetcasefatalityratio = datasetcasefatalityratio[,-19]
@@ -397,21 +402,22 @@ datasetcasefatalityratio$Unvaccinated.case.fatality.ratio = datasetcasefatalityr
 datasetvaxcasefatalityratio = subset(datasetcasefatalityratio, Vaccine.product %in% c("Janssen","Moderna","Pfizer"))
 datasetunvaxcasefatalityratio = datasetcasefatalityratio[datasetcasefatalityratio$Vaccine.product == "all_types",]
 
-g <- ggplot(datasetvaxcasefatalityratio, aes(x=Vaccine.product,y=Vaccinated.case.fatality.ratio))
-g + geom_boxplot(varwidth=T, fill="plum") +
-labs(title="Box plot of Case Fatality Ratios",
-subtitle="By Vaccination Status and Product Type",
+v <- ggplot(datasetvaxcasefatalityratio, aes(x=Vaccine.product,y=Vaccinated.case.fatality.ratio)) + geom_boxplot(varwidth=T, fill="plum") +
+labs(title="Box plot of Vaccinated Case Fatality Ratios",
+subtitle="By Vaccination Product Type",
 caption="Source: CDC",
 x="Vaccine Type",
 y="Case Fatality Ratio")
 
-g <- ggplot(datasetunvaxcasefatalityratio, aes(x=Vaccine.product,y=Unvaccinated.case.fatality.ratio))
-g + geom_boxplot(varwidth=T, fill="plum") +
-labs(title="Box plot of Case Fatality Ratios",
-subtitle="By Vaccination Status and Product Type",
+u <- ggplot(datasetunvaxcasefatalityratio, aes(x=Vaccine.product,y=Unvaccinated.case.fatality.ratio)) + geom_boxplot(varwidth=T, fill="plum") +
+labs(title="Box plot of Unvaccinated Case Fatality Ratios",
 caption="Source: CDC",
 x="Unvaccinated",
 y="Case Fatality Ratio")
+
+figure = ggarrange(v, u,
+                   ncol = 2)
+figure
 
 # Are the case fatality ratios stable between vaccine types? T-Test
 # Are vaccinated and unvaccinated statistically different on deaths per 100k and case fatality ratios?
