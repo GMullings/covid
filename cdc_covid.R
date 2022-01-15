@@ -390,8 +390,8 @@ casefatalityratios = cbind.data.frame(casefatalityratios, jajcasefatalityratio, 
 datasetcasefatalityratio = cbind.data.frame(head(datasetcases, -30),datasetdeaths[,6:9])
 datasetcasefatalityratio = datasetcasefatalityratio[,-18]
 datasetcasefatalityratio = datasetcasefatalityratio[,-19]
-datasetcasefatalityratio$Vaccinated.case.fatality.ratio = datasetcasefatalityratio[,17]/datasetcasefatalityratio[,6]
-datasetcasefatalityratio$Unvaccinated.case.fatality.ratio = datasetcasefatalityratio[,18]/datasetcasefatalityratio[,8]
+datasetcasefatalityratio$Vaccinated.case.fatality.ratio = datasetcasefatalityratio[,17]/datasetcasefatalityratio[,7]
+datasetcasefatalityratio$Unvaccinated.case.fatality.ratio = datasetcasefatalityratio[,18]/datasetcasefatalityratio[,9]
 
 # Plotting case fatality ratios for vaccines
 datasetvaxcasefatalityratio = subset(datasetcasefatalityratio, Vaccine.product %in% c("Janssen","Moderna","Pfizer"))
@@ -402,17 +402,15 @@ g + geom_boxplot(varwidth=T, fill="plum") +
 labs(title="Box plot of Case Fatality Ratios",
 subtitle="By Vaccination Status and Product Type",
 caption="Source: CDC",
-x="Status/Vaccine Type",
+x="Vaccine Type",
 y="Case Fatality Ratio")
-
-# Case Fatality Ratios are much higher for the non-J&J jabs.
 
 g <- ggplot(datasetunvaxcasefatalityratio, aes(x=Vaccine.product,y=Unvaccinated.case.fatality.ratio))
 g + geom_boxplot(varwidth=T, fill="plum") +
 labs(title="Box plot of Case Fatality Ratios",
 subtitle="By Vaccination Status and Product Type",
 caption="Source: CDC",
-x="Status/Vaccine Type",
+x="Unvaccinated",
 y="Case Fatality Ratio")
 
 # Are the case fatality ratios stable between vaccine types? T-Test
