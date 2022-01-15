@@ -422,9 +422,30 @@ u <- ggplot(transfcasefatalr, aes(x=Vaccine.status,y=Case.fatality.ratio)) + geo
        x="Vaccination Status",
        y="Case Fatality Ratio")
 
-figure = ggarrange(v, u,
+genfigure = ggarrange(v, u,
                    ncol = 2)
-figure
+genfigure
+
+youngdsvaxcfr = subset(datasetvaxcasefatalityratio, Age.group="12-17")
+youngtranscfr = subset(transfcasefatalr, Age.group="12-17")
+
+y1 <- ggplot(youngdsvaxcfr, aes(x=Vaccine.product,y=Case.fatality.ratio)) + geom_boxplot(varwidth=T, fill="plum") +
+  labs(title="Box plot of Vaccinated Case Fatality Ratios",
+       subtitle="By Vaccination Product Type",
+       caption="Source: CDC",
+       x="Vaccine Type",
+       y="Case Fatality Ratio")
+
+y2 <- ggplot(youngtranscfr, aes(x=Vaccine.status,y=Case.fatality.ratio)) + geom_boxplot(varwidth=T, fill="plum") +
+  labs(title="Box plot of Case Fatality Ratios by Vaccination Status",
+       subtitle="True = Vaccinated",
+       caption="Source: CDC",
+       x="Vaccination Status",
+       y="Case Fatality Ratio")
+
+youngfigure = ggarrange(y1, y2,
+                        ncol = 2)
+youngfigure
 
 # Are the case fatality ratios stable between vaccine types? T-Test
 # Are vaccinated and unvaccinated statistically different on deaths per 100k and case fatality ratios?
