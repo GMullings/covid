@@ -1,7 +1,9 @@
 setwd("~/R/covid")
 .libPaths(c("C:/Users/geoff/Documents/R/win-library/3.6"))
+install.packages("ggplot2")
 install.packages("scales")
 install.packages("ggpubr")
+library("ggplot2")
 library("scales")
 library("ggpubr")
 
@@ -592,7 +594,6 @@ age100kfig
 
 # Are the case fatality ratios stable between vaccine types? T-Test
 # Are vaccinated and unvaccinated statistically different on deaths per 100k and case fatality ratios?
-# Are the deaths per 100k or the case fatality ratios stable across age groups within vaccinated vs unvaccinated?
 
 # Need to plot case and death rates over time
 
