@@ -385,26 +385,6 @@ colnames(pfzrcasefatalityratio) = "Pfizer"
 
 pfzrdeathshundredk = pfzrvaxdeathrate*100000
 
-# Combining vaccinated deaths per 100ks for all ages
-#deathshundredk = cbind.data.frame(deathshundredk,jajdeathshundredk,mdrnadeathshundredk,pfzrdeathshundredk)
-#casefatalityratios = cbind.data.frame(casefatalityratios, jajcasefatalityratio, mdrnacasefatalityratio, pfzrcasefatalityratio)
-
-#datasetcases = dataset[dataset$outcome == "case",]
-#datasetdeaths = dataset[dataset$outcome == "death",]
-
-#datasetcasefatalityratio = cbind.data.frame(head(datasetcases, -30),datasetdeaths[,6:9])
-#datasetcasefatalityratio = datasetcasefatalityratio[,-18]
-#datasetcasefatalityratio = datasetcasefatalityratio[,-19]
-#dsvaxcasefatalityr = data.frame(datasetcasefatalityratio[,17]/datasetcasefatalityratio[,7])
-#colnames(dsvaxcasefatalityr) = "Case.fatality.ratio"
-#dsvaxcasefatalityr$Vaccine.status = "True"
-#dsvaxcasefatalityr = cbind.data.frame(datasetcasefatalityratio, dsvaxcasefatalityr)
-#dsunvaxcasefatalityr = data.frame(datasetcasefatalityratio[,18]/datasetcasefatalityratio[,9])
-#colnames(dsunvaxcasefatalityr) = "Case.fatality.ratio"
-#dsunvaxcasefatalityr$Vaccine.status = "False"
-#dsunvaxcasefatalityr = cbind.data.frame(datasetcasefatalityratio, dsunvaxcasefatalityr)
-#transfcasefatalr = rbind.data.frame(dsunvaxcasefatalityr, dsvaxcasefatalityr)
-
 # Plotting case fatality ratios for vaccines
 vaxtypecasefatalityratio = subset(vaxcasefatalityratio, Vaccine.product %in% c("Janssen","Moderna","Pfizer"))
 casefatalityratio = rbind.data.frame(unvaxcasefatalityratio, vaxcasefatalityratio)
@@ -419,7 +399,7 @@ y="Case Fatality Ratio")
 
 u <- ggplot(graphcfr, aes(x=Vaccinated,y=Case.fatality.ratio)) + geom_boxplot(varwidth=T, fill="plum", aes(color=Age.group)) +
   labs(title="Box plot of Case Fatality Ratios by Vaccination Status",
-       subtitle="True = Vaccinated",
+       subtitle="Yes = Vaccinated",
        caption="Source: CDC",
        x="Vaccination Status",
        y="Case Fatality Ratio")
@@ -457,9 +437,72 @@ gen100kfig = ggarrange(v100k, u100k, age100k,
                        ncol = 2)
 gen100kfig
 
-# Need to plot case fatality ratios over time by vaccine product
+# Plotting weekly Case Fatality Ratios, seems seasonal
+allagescfr = casefatalityratio[casefatalityratio$Age.group == "all_ages_adj",]
+ln <-ggplot(allagescfr, aes(x=MMWR.week, y=Case.fatality.ratio, group=Vaccine.product)) +
+geom_line(aes(linetype=Vaccine.product, color=Vaccine.product))+
+geom_point(aes(shape=Vaccine.product, color=Vaccine.product)) +
+  labs(title="Graph of Weekly Case Fatality Ratios by Vaccine Product",
+       subtitle="All ages, adjusted",
+       caption="Source: CDC",
+       x="MMWR Week",
+       y="Case Fatality Ratio")
+ln
+
+ln1 <-ggplot(allagescfr, aes(x=MMWR.week, y=Case.fatality.ratio, group=Vaccinated)) +
+  geom_line(aes(linetype=Vaccinated, color=Vaccinated))+
+  geom_point(aes(shape=Vaccinated, color=Vaccinated)) +
+  labs(title="Graph of Weekly Case Fatality Ratios by Vaccine Status",
+       subtitle="All ages, adjusted",
+       caption="Source: CDC",
+       x="MMWR Week",
+       y="Case Fatality Ratio")
+ln1
+
+ln2 <-ggplot(casefatalityratio, aes(x=MMWR.week, y=Case.fatality.ratio, group=Age.group)) +
+  geom_line(aes(linetype=Age.group, color=Age.group))+
+  geom_point(aes(shape=Age.group, color=Age.group)) +
+  labs(title="Graph of Weekly Case Fatality Ratios by Age",
+       subtitle="All ages, adjusted",
+       caption="Source: CDC",
+       x="MMWR Week",
+       y="Case Fatality Ratio")
+
+# Plotting weekly Deaths Per 100k
+allagesd100k = deathsrate[deathsrate$Age.group == "all_ages_adj",]
+vaxallages100k = allagesd100k[allagesd100k$Vaccinated == "Yes",]
+ln3 <-ggplot(vaxallages100k, aes(x=MMWR.week, y=Deaths.per.100k, group=Vaccine.product)) +
+  geom_line(aes(linetype=Vaccine.product, color=Vaccine.product))+
+  geom_point(aes(shape=Vaccine.product, color=Vaccine.product)) +
+  labs(title="Graph of Weekly Deaths Per 100k by Vaccine Product",
+       subtitle="All ages, adjusted",
+       caption="Source: CDC",
+       x="MMWR Week",
+       y="Deaths Per 100k")
+ln3
+
+ln4 <-ggplot(allagesd100k, aes(x=MMWR.week, y=Deaths.per.100k, group=Vaccinated)) +
+  geom_line(aes(linetype=Vaccinated, color=Vaccinated))+
+  geom_point(aes(shape=Vaccinated, color=Vaccinated)) +
+  labs(title="Graph of Weekly Deaths Per 100k by Vaccine Status",
+       subtitle="All ages, adjusted",
+       caption="Source: CDC",
+       x="MMWR Week",
+       y="Deaths Per 100k")
+ln4
+
+ln5 <-ggplot(deathsrate, aes(x=MMWR.week, y=Deaths.per.100k, group=Age.group)) +
+  geom_line(aes(linetype=Age.group, color=Age.group))+
+  geom_point(aes(shape=Age.group, color=Age.group)) +
+  labs(title="Graph of Weekly Deaths Per 100k by Age",
+       subtitle="All ages, adjusted",
+       caption="Source: CDC",
+       x="MMWR Week",
+       y="Deaths Per 100k")
+ln5
+
 # Are the case fatality ratios stable between vaccine types? T-Test
-# Are vaccinated and unvaccinated statistically different on deaths per 100k and case fatality ratios?
+# Are vaccinated and unvaccinated statistically different on case fatality ratios? By Age?
 
 # Need to plot case and death rates over time
 
