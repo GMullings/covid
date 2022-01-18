@@ -417,7 +417,7 @@ caption="Source: CDC",
 x="Vaccine Type",
 y="Case Fatality Ratio")
 
-u <- ggplot(graphcfr, aes(x=Vaccinated,y=Case.fatality.ratio)) + geom_boxplot(varwidth=T, fill="plum") +
+u <- ggplot(graphcfr, aes(x=Vaccinated,y=Case.fatality.ratio)) + geom_boxplot(varwidth=T, fill="plum", aes(color=Age.group)) +
   labs(title="Box plot of Case Fatality Ratios by Vaccination Status",
        subtitle="True = Vaccinated",
        caption="Source: CDC",
@@ -427,70 +427,6 @@ u <- ggplot(graphcfr, aes(x=Vaccinated,y=Case.fatality.ratio)) + geom_boxplot(va
 genfigure = ggarrange(v, u,
                    ncol = 2)
 genfigure
-
-# Plotting Case Fatality Ratios by Vax Status for 12-17
-teenstranscfr = graphcfr[graphcfr$Age.group == "12-17", ]
-
-t <- ggplot(teenstranscfr, aes(x=Vaccinated,y=Case.fatality.ratio)) + geom_boxplot(varwidth=T, fill="plum") +
-  labs(title="Teens 12-17",
-       subtitle="True = Vaccinated",
-       caption="Source: CDC",
-       x="Vaccination Status",
-       y="Case Fatality Ratio")
-
-# Plotting Case Fatality Ratios by Vax Status for 18-29
-yngadltstranscfr = graphcfr[graphcfr$Age.group == "18-29", ]
-
-y1 <- ggplot(yngadltstranscfr, aes(x=Vaccinated,y=Case.fatality.ratio)) + geom_boxplot(varwidth=T, fill="plum") +
-  labs(title="Young Adults 18-29",
-       subtitle="True = Vaccinated",
-       caption="Source: CDC",
-       x="Vaccination Status",
-       y="Case Fatality Ratio")
-
-# Plotting Case Fatality Ratios by Vax Status for 30-49
-mdagestranscfr = graphcfr[graphcfr$Age.group == "30-49", ]
-
-md <- ggplot(mdagestranscfr, aes(x=Vaccinated,y=Case.fatality.ratio)) + geom_boxplot(varwidth=T, fill="plum") +
-  labs(title="Middle Age 30-49",
-       subtitle="True = Vaccinated",
-       caption="Source: CDC",
-       x="Vaccination Status",
-       y="Case Fatality Ratio")
-
-# Plotting Case Fatality Ratios by Vax Status for 50-64
-oldtranscfr = graphcfr[graphcfr$Age.group == "50-64", ]
-
-old <- ggplot(oldtranscfr, aes(x=Vaccinated,y=Case.fatality.ratio)) + geom_boxplot(varwidth=T, fill="plum") +
-  labs(title="Older 50-64",
-       subtitle="True = Vaccinated",
-       caption="Source: CDC",
-       x="Vaccination Status",
-       y="Case Fatality Ratio")
-
-# Plotting Case Fatality Ratios by Vax Status for 65-79
-goldentranscfr = graphcfr[graphcfr$Age.group == "65-79", ]
-
-gold <- ggplot(goldentranscfr, aes(x=Vaccinated,y=Case.fatality.ratio)) + geom_boxplot(varwidth=T, fill="plum") +
-  labs(title="Seniors 65-79",
-       subtitle="True = Vaccinated",
-       caption="Source: CDC",
-       x="Vaccination Status",
-       y="Case Fatality Ratio")
-
-# Plotting Case Fatality Ratios by Vax Status for 80+
-eoltranscfr = graphcfr[graphcfr$Age.group == "80+", ]
-
-eol <- ggplot(eoltranscfr, aes(x=Vaccinated,y=Case.fatality.ratio)) + geom_boxplot(varwidth=T, fill="plum") +
-  labs(title="End of Life 80+",
-       subtitle="True = Vaccinated",
-       caption="Source: CDC",
-       x="Vaccination Status",
-       y="Case Fatality Ratio")
-
-agefigure = ggarrange(t, y1, md, old, gold, eol,
-                      ncol = 3, nrow = 2)
-agefigure # There are a lot of outlier deaths among vaccinated young, <50
 
 # Plotting Deaths per 100k for vaccines
 vaxdeathrate = deathsrate[deathsrate$Vaccinated == "Yes",]
@@ -503,80 +439,23 @@ v100k <- ggplot(vaxdeathshundredtype, aes(x=Vaccine.product,y=Deaths.per.100k)) 
        x="Vaccine Type",
        y="Deaths Per 100k")
 
-u100k <- ggplot(deathsrate, aes(x=Vaccinated,y=Deaths.per.100k)) + geom_boxplot(varwidth=T, fill="plum") +
+u100k <- ggplot(deathsrate, aes(x=Vaccinated,y=Deaths.per.100k)) + geom_boxplot(varwidth=T, fill="plum", aes(color=Vaccine.product)) +
   labs(title="Box plot of Deaths Per 100k by Vaccination Status",
-       subtitle="True = Vaccinated",
+       subtitle="Yes = Vaccinated",
        caption="Source: CDC",
        x="Vaccination Status",
        y="Deaths Per 100k")
 
-gen100kfig = ggarrange(v100k, u100k,
+age100k <- ggplot(deathsrate, aes(x=Vaccinated,y=Deaths.per.100k)) + geom_boxplot(varwidth=T, fill="plum", aes(color=Age.group)) +
+  labs(title="Box plot of Deaths Per 100k by Vaccination Status",
+       subtitle="Yes = Vaccinated",
+       caption="Source: CDC",
+       x="Vaccination Status",
+       y="Deaths Per 100k")
+
+gen100kfig = ggarrange(v100k, u100k, age100k,
                        ncol = 2)
 gen100kfig
-
-# Plotting Deaths Per 100k by Vax Status for 12-17
-teenstransd100k = deathsrate[deathsrate$Age.group == "12-17", ]
-
-t100k <- ggplot(teenstransd100k, aes(x=Vaccinated,y=Deaths.per.100k)) + geom_boxplot(varwidth=T, fill="plum") +
-  labs(title="Teens 12-17",
-       subtitle="True = Vaccinated",
-       caption="Source: CDC",
-       x="Vaccination Status",
-       y="Deaths Per 100k")
-
-# Plotting Deaths Per 100k by Vax Status for 18-29
-yngadltstransd100k = deathsrate[deathsrate$Age.group == "18-29", ]
-
-y100k <- ggplot(yngadltstransd100k, aes(x=Vaccinated,y=Deaths.per.100k)) + geom_boxplot(varwidth=T, fill="plum") +
-  labs(title="Young Adults 18-29",
-       subtitle="True = Vaccinated",
-       caption="Source: CDC",
-       x="Vaccination Status",
-       y="Deaths Per 100k")
-
-# Plotting Deaths Per 100k by Vax Status for 30-49
-mdagestransd100k = deathsrate[deathsrate$Age.group == "30-49", ]
-
-md100k <- ggplot(mdagestransd100k, aes(x=Vaccinated,y=Deaths.per.100k)) + geom_boxplot(varwidth=T, fill="plum") +
-  labs(title="Middle Age 30-49",
-       subtitle="True = Vaccinated",
-       caption="Source: CDC",
-       x="Vaccination Status",
-       y="Deaths Per 100k")
-
-# Plotting Deaths Per 100k by Vax Status for 50-64
-oldtransd100k = deathsrate[deathsrate$Age.group == "50-64", ]
-
-old100k <- ggplot(oldtransd100k, aes(x=Vaccinated,y=Deaths.per.100k)) + geom_boxplot(varwidth=T, fill="plum") +
-  labs(title="Older 50-64",
-       subtitle="True = Vaccinated",
-       caption="Source: CDC",
-       x="Vaccination Status",
-       y="Deaths Per 100k")
-
-# Plotting Deaths Per 100k by Vax Status for 65-79
-goldentransd100k = deathsrate[deathsrate$Age.group == "65-79", ]
-
-gold100k <- ggplot(goldentransd100k, aes(x=Vaccinated,y=Deaths.per.100k)) + geom_boxplot(varwidth=T, fill="plum") +
-  labs(title="Seniors 65-79",
-       subtitle="True = Vaccinated",
-       caption="Source: CDC",
-       x="Vaccination Status",
-       y="Deaths Per 100k")
-
-# Plotting Deaths Per 100k by Vax Status for 80+
-eoltransd100k = deathsrate[deathsrate$Age.group == "80+", ]
-
-eol100k <- ggplot(eoltransd100k, aes(x=Vaccinated,y=Deaths.per.100k)) + geom_boxplot(varwidth=T, fill="plum") +
-  labs(title="End of Life 80+",
-       subtitle="True = Vaccinated",
-       caption="Source: CDC",
-       x="Vaccination Status",
-       y="Deaths Per 100k")
-
-age100kfig = ggarrange(t100k, y100k, md100k, old100k, gold100k, eol100k,
-                       ncol = 3, nrow = 2)
-age100kfig
 
 # Need to plot case fatality ratios over time by vaccine product
 # Are the case fatality ratios stable between vaccine types? T-Test
