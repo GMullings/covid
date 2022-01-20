@@ -501,7 +501,22 @@ ln5 <-ggplot(deathsrate, aes(x=MMWR.week, y=Deaths.per.100k, group=Age.group)) +
        y="Deaths Per 100k")
 ln5
 
-# Are the case fatality ratios stable between vaccine types? T-Test
+# Are the case fatality ratios stable between vaccine types?
+
+pfizercfr = allagescfr[allagescfr$Vaccine.product == "Pfizer",]
+mdrnacfr = allagescfr[allagescfr$Vaccine.product == "Moderna",]
+jajcfr = allagescfr[allagescfr$Vaccine.product == "Janssen",]
+pfizercfr = pfizercfr[pfizercfr$Vaccinated == "Yes",]
+mdrnacfr = mdrnacfr[mdrnacfr$Vaccinated == "Yes",]
+jajcfr = jajcfr[jajcfr$Vaccinated == "Yes",]
+dim(pfizercfr)
+dim(mdrnacfr)
+dim(jajcfr)
+t.test(mdrnacfr$Case.fatality.ratio, pfizercfr$Case.fatality.ratio, paired=TRUE)
+t.test(jajcfr$Case.fatality.ratio, pfizercfr$Case.fatality.ratio, paired=TRUE)
+t.test(jajcfr$Case.fatality.ratio, mdrnacfr$Case.fatality.ratio, paired=TRUE)
+
+
 # Are vaccinated and unvaccinated statistically different on case fatality ratios? By Age?
 
 # Need to plot case and death rates over time
