@@ -501,7 +501,7 @@ ln5 <-ggplot(deathsrate, aes(x=MMWR.week, y=Deaths.per.100k, group=Age.group)) +
        y="Deaths Per 100k")
 ln5
 
-# Are the case fatality ratios stable between vaccine types?
+# Are the case fatality ratios stable between vaccine types? The distribution of case fatalities seems normal enough to use a two-sample T-test.
 
 pfizercfr = allagescfr[allagescfr$Vaccine.product == "Pfizer",]
 mdrnacfr = allagescfr[allagescfr$Vaccine.product == "Moderna",]
@@ -512,12 +512,25 @@ jajcfr = jajcfr[jajcfr$Vaccinated == "Yes",]
 dim(pfizercfr)
 dim(mdrnacfr)
 dim(jajcfr)
-t.test(mdrnacfr$Case.fatality.ratio, pfizercfr$Case.fatality.ratio, paired=TRUE)
-t.test(jajcfr$Case.fatality.ratio, pfizercfr$Case.fatality.ratio, paired=TRUE)
-t.test(jajcfr$Case.fatality.ratio, mdrnacfr$Case.fatality.ratio, paired=TRUE)
+# Not sure if the vaccinated CFRs are actually normally distributed. Moderna and Pfizer seem skewed, particularly compared to Janssen. 
+shapiro.test(jajcfr$Case.fatality.ratio) #J&J not normally distributed.
+shapiro.test(mdrnacfr$Case.fatality.ratio) #Moderna normally distributed.
+shapiro.test(pfizercfr$Case.fatality.ratio) #Pfizer not normally distributed.
 
+# Let's see the Wilcox test.
+wilcox.test(mdrnacfr$Case.fatality.ratio, pfizercfr$Case.fatality.ratio, paired=TRUE) # Low p-value indicates significant difference. Moderna and Pfizer's CFRs are significantly different
+wilcox.test(mdrnacfr$Case.fatality.ratio, pfizercfr$Case.fatality.ratio, paired=TRUE, alternative="greater") # Moderna's CFR is significantly higher than Pfizer's - why?
+wilcox.test(jajcfr$Case.fatality.ratio, pfizercfr$Case.fatality.ratio, paired=TRUE) # J&J and Pfizer have similar CFRs.
+wilcox.test(jajcfr$Case.fatality.ratio, mdrnacfr$Case.fatality.ratio, paired=TRUE) # Significant difference between Moderna and J&J
+wilcox.test(jajcfr$Case.fatality.ratio, mdrnacfr$Case.fatality.ratio, paired=TRUE, alternative="less") # Janssen's CFR is significantly lower than Moderna's
 
-# Are vaccinated and unvaccinated statistically different on case fatality ratios? By Age?
+# Are the vaccinated and unvaccinated statistically different on case fatality ratios?
+shapiro.test(vaxcasefatalityratio$Case.fatality.ratio)
+shapiro.test(unvaxcasefatalityratio$Case.fatality.ratio)
+# Both are normally distributed, a T-test is appropriate.
+t.test(unvaxcasefatalityratio$Case.fatality.ratio, vaxcasefatalityratio$Case.fatality.ratio, paired=TRUE) # Significant difference between vaccinated and unvaccinated CFRs.
+
+# Are the vaccinated and unvaccinated statistically different on CFR By Age?
 
 # Need to plot case and death rates over time
 
