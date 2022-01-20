@@ -527,10 +527,35 @@ wilcox.test(jajcfr$Case.fatality.ratio, mdrnacfr$Case.fatality.ratio, paired=TRU
 # Are the vaccinated and unvaccinated statistically different on case fatality ratios?
 shapiro.test(vaxcasefatalityratio$Case.fatality.ratio)
 shapiro.test(unvaxcasefatalityratio$Case.fatality.ratio)
-# Both are normally distributed, a T-test is appropriate.
-t.test(unvaxcasefatalityratio$Case.fatality.ratio, vaxcasefatalityratio$Case.fatality.ratio, paired=TRUE) # Significant difference between vaccinated and unvaccinated CFRs.
+shapiro.test(subset(vaxcasefatalityratio, Age.group == "12-17")$Case.fatality.ratio)
+shapiro.test(subset(unvaxcasefatalityratio, Age.group == "12-17")$Case.fatality.ratio)
+shapiro.test(subset(vaxcasefatalityratio, Age.group == "18-29")$Case.fatality.ratio)
+shapiro.test(subset(unvaxcasefatalityratio, Age.group == "18-29")$Case.fatality.ratio) # Not normally distributed, will use a wilcox test.
+shapiro.test(subset(vaxcasefatalityratio, Age.group == "30-49")$Case.fatality.ratio)
+shapiro.test(subset(unvaxcasefatalityratio, Age.group == "30-49")$Case.fatality.ratio) # Not normally distributed, will use a wilcox test.
+shapiro.test(subset(vaxcasefatalityratio, Age.group == "50-64")$Case.fatality.ratio)
+shapiro.test(subset(unvaxcasefatalityratio, Age.group == "50-64")$Case.fatality.ratio) # Not normally distributed, will use a wilcox test.
+shapiro.test(subset(vaxcasefatalityratio, Age.group == "65-79")$Case.fatality.ratio) # Not normally distributed
+shapiro.test(subset(unvaxcasefatalityratio, Age.group == "65-79")$Case.fatality.ratio) # Not normally distributed
+shapiro.test(subset(vaxcasefatalityratio, Age.group == "80+")$Case.fatality.ratio) # Not normally distributed
+shapiro.test(subset(unvaxcasefatalityratio, Age.group == "80+")$Case.fatality.ratio) # Not normally distributed
 
-# Are the vaccinated and unvaccinated statistically different on CFR By Age?
+# All that are normally distributed are given a T-test.
+t.test(unvaxcasefatalityratio$Case.fatality.ratio, vaxcasefatalityratio$Case.fatality.ratio, paired=TRUE) # Significant difference between vaccinated and unvaccinated CFRs.
+t.test(subset(unvaxcasefatalityratio, Age.group == "12-17")$Case.fatality.ratio, subset(vaxcasefatalityratio, Age.group == "12-17")$Case.fatality.ratio, paired=TRUE) # Significant difference between vaccinated and unvaccinated CFRs.
+
+# Wilcox test for the abnormals
+wilcox.test(subset(unvaxcasefatalityratio, Age.group == "18-29")$Case.fatality.ratio, subset(vaxcasefatalityratio, Age.group == "18-29")$Case.fatality.ratio, paired=TRUE) # Significant difference
+wilcox.test(subset(unvaxcasefatalityratio, Age.group == "18-29")$Case.fatality.ratio, subset(vaxcasefatalityratio, Age.group == "18-29")$Case.fatality.ratio, paired=TRUE, alternative="greater") # Significantly higher rates among unvaccinated.
+wilcox.test(subset(unvaxcasefatalityratio, Age.group == "30-49")$Case.fatality.ratio, subset(vaxcasefatalityratio, Age.group == "30-49")$Case.fatality.ratio, paired=TRUE) # Significant difference
+wilcox.test(subset(unvaxcasefatalityratio, Age.group == "30-49")$Case.fatality.ratio, subset(vaxcasefatalityratio, Age.group == "30-49")$Case.fatality.ratio, paired=TRUE, alternative="greater") # Significantly higher rates among unvaccinated.
+wilcox.test(subset(unvaxcasefatalityratio, Age.group == "50-64")$Case.fatality.ratio, subset(vaxcasefatalityratio, Age.group == "50-64")$Case.fatality.ratio, paired=TRUE) # Significant difference
+wilcox.test(subset(unvaxcasefatalityratio, Age.group == "50-64")$Case.fatality.ratio, subset(vaxcasefatalityratio, Age.group == "50-64")$Case.fatality.ratio, paired=TRUE, alternative="greater") # Significantly higher rates among unvaccinated.
+wilcox.test(subset(unvaxcasefatalityratio, Age.group == "65-79")$Case.fatality.ratio, subset(vaxcasefatalityratio, Age.group == "65-79")$Case.fatality.ratio, paired=TRUE) # Significant difference
+wilcox.test(subset(unvaxcasefatalityratio, Age.group == "65-79")$Case.fatality.ratio, subset(vaxcasefatalityratio, Age.group == "65-79")$Case.fatality.ratio, paired=TRUE, alternative="greater") # Significantly higher rates among unvaccinated.
+wilcox.test(subset(unvaxcasefatalityratio, Age.group == "80+")$Case.fatality.ratio, subset(vaxcasefatalityratio, Age.group == "80+")$Case.fatality.ratio, paired=TRUE) # Significant difference
+wilcox.test(subset(unvaxcasefatalityratio, Age.group == "80+")$Case.fatality.ratio, subset(vaxcasefatalityratio, Age.group == "80+")$Case.fatality.ratio, paired=TRUE, alternative="greater") # Significantly higher rates among unvaccinated.
+
 
 # Need to plot case and death rates over time
 
