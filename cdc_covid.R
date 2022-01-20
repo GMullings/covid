@@ -556,7 +556,70 @@ wilcox.test(subset(unvaxcasefatalityratio, Age.group == "65-79")$Case.fatality.r
 wilcox.test(subset(unvaxcasefatalityratio, Age.group == "80+")$Case.fatality.ratio, subset(vaxcasefatalityratio, Age.group == "80+")$Case.fatality.ratio, paired=TRUE) # Significant difference
 wilcox.test(subset(unvaxcasefatalityratio, Age.group == "80+")$Case.fatality.ratio, subset(vaxcasefatalityratio, Age.group == "80+")$Case.fatality.ratio, paired=TRUE, alternative="greater") # Significantly higher rates among unvaccinated.
 
+# Not sure if the vaccinated Deaths Per 100k are actually normally distributed. Moderna and Pfizer seem skewed, particularly compared to Janssen. 
+shapiro.test(subset(vaxdeathrate, Vaccine.product == "Janssen")$Deaths.per.100k)
+shapiro.test(subset(vaxdeathrate, Vaccine.product == "Moderna")$Deaths.per.100k)
+shapiro.test(subset(vaxdeathrate, Vaccine.product == "Pfizer")$Deaths.per.100k)
 
+# T-Test is appropriate
+t.test(subset(vaxdeathrate, Vaccine.product == "Janssen")$Deaths.per.100k, subset(vaxdeathrate, Vaccine.product == "Moderna")$Deaths.per.100k, paired=TRUE) # Significant difference
+t.test(subset(vaxdeathrate, Vaccine.product == "Janssen")$Deaths.per.100k, subset(vaxdeathrate, Vaccine.product == "Moderna")$Deaths.per.100k, paired=TRUE, alternative="greater") # Janssen deaths per 100k are significantly higher.
+t.test(subset(vaxdeathrate, Vaccine.product == "Pfizer")$Deaths.per.100k, subset(vaxdeathrate, Vaccine.product == "Moderna")$Deaths.per.100k, paired=TRUE) # Significant difference
+t.test(subset(vaxdeathrate, Vaccine.product == "Pfizer")$Deaths.per.100k, subset(vaxdeathrate, Vaccine.product == "Moderna")$Deaths.per.100k, paired=TRUE, alternative = "greater") # Pfizer deaths per 100k are significantly higher.
+t.test(subset(vaxdeathrate, Vaccine.product == "Pfizer")$Deaths.per.100k, subset(vaxdeathrate, Vaccine.product == "Janssen")$Deaths.per.100k, paired=TRUE) # Significant difference
+t.test(subset(vaxdeathrate, Vaccine.product == "Pfizer")$Deaths.per.100k, subset(vaxdeathrate, Vaccine.product == "Janssen")$Deaths.per.100k, paired=TRUE, alternative = "less") # Pfizer deaths per 100k are significantly lower.
+
+# Are the vaccinated and unvaccinated statistically different on Deaths per 100k?
+unvaxdeathrate = deathsrate[deathsrate$Vaccinated == "No",]
+shapiro.test(vaxdeathrate$Deaths.per.100k)
+shapiro.test(unvaxdeathrate$Deaths.per.100k)
+shapiro.test(subset(vaxdeathrate, Age.group == "12-17")$Deaths.per.100k)
+shapiro.test(subset(unvaxdeathrate, Age.group == "12-17")$Deaths.per.100k)
+shapiro.test(subset(vaxdeathrate, Age.group == "18-29")$Deaths.per.100k)
+shapiro.test(subset(unvaxdeathrate, Age.group == "18-29")$Deaths.per.100k)
+shapiro.test(subset(vaxdeathrate, Age.group == "30-49")$Deaths.per.100k) # Not normally distributed, will use a wilcox test.
+shapiro.test(subset(unvaxdeathrate, Age.group == "30-49")$Deaths.per.100k)
+shapiro.test(subset(vaxdeathrate, Age.group == "50-64")$Deaths.per.100k)
+shapiro.test(subset(unvaxdeathrate, Age.group == "50-64")$Deaths.per.100k) 
+shapiro.test(subset(vaxdeathrate, Age.group == "65-79")$Deaths.per.100k)
+shapiro.test(subset(unvaxdeathrate, Age.group == "65-79")$Deaths.per.100k)
+shapiro.test(subset(vaxdeathrate, Age.group == "80+")$Deaths.per.100k)
+shapiro.test(subset(unvaxdeathrate, Age.group == "80+")$Deaths.per.100k) # Not normally distributed.
+
+# T-Test where appropriate
+t.test(unvaxdeathrate$Deaths.per.100k, vaxdeathrate$Deaths.per.100k, paired=TRUE) # Significantly different death rates
+t.test(subset(unvaxdeathrate, Age.group == "12-17")$Deaths.per.100k, subset(vaxdeathrate, Age.group == "12-17")$Deaths.per.100k, paired=TRUE)
+t.test(subset(unvaxdeathrate, Age.group == "12-17")$Deaths.per.100k, subset(vaxdeathrate, Age.group == "12-17")$Deaths.per.100k, paired=TRUE, alternative="greater") #Unvaxxed rate is significantly higher
+t.test(subset(unvaxdeathrate, Age.group == "18-29")$Deaths.per.100k, subset(vaxdeathrate, Age.group == "18-29")$Deaths.per.100k, paired=TRUE)
+t.test(subset(unvaxdeathrate, Age.group == "18-29")$Deaths.per.100k, subset(vaxdeathrate, Age.group == "18-29")$Deaths.per.100k, paired=TRUE, alternative = "greater") #Unvaxxed rate is significantly higher
+t.test(subset(unvaxdeathrate, Age.group == "50-64")$Deaths.per.100k, subset(vaxdeathrate, Age.group == "50-64")$Deaths.per.100k, paired=TRUE)
+t.test(subset(unvaxdeathrate, Age.group == "50-64")$Deaths.per.100k, subset(vaxdeathrate, Age.group == "50-64")$Deaths.per.100k, paired=TRUE, alternative = "greater") #Unvaxxed rate is significantly higher
+t.test(subset(unvaxdeathrate, Age.group == "65-79")$Deaths.per.100k, subset(vaxdeathrate, Age.group == "65-79")$Deaths.per.100k, paired=TRUE)
+t.test(subset(unvaxdeathrate, Age.group == "65-79")$Deaths.per.100k, subset(vaxdeathrate, Age.group == "65-79")$Deaths.per.100k, paired=TRUE, alternative = "greater") #Unvaxxed rate is significantly higher
+
+# Wilcox tests for the abnormals
+wilcox.test(subset(unvaxdeathrate, Age.group == "30-49")$Deaths.per.100k, subset(vaxdeathrate, Age.group == "30-49")$Deaths.per.100k, paired=TRUE)
+wilcox.test(subset(unvaxdeathrate, Age.group == "30-49")$Deaths.per.100k, subset(vaxdeathrate, Age.group == "30-49")$Deaths.per.100k, paired=TRUE, alternative = "greater") #Unvaxxed rate is significantly higher
+wilcox.test(subset(unvaxdeathrate, Age.group == "80+")$Deaths.per.100k, subset(vaxdeathrate, Age.group == "80+")$Deaths.per.100k, paired=TRUE)
+wilcox.test(subset(unvaxdeathrate, Age.group == "80+")$Deaths.per.100k, subset(vaxdeathrate, Age.group == "80+")$Deaths.per.100k, paired=TRUE, alternative="greater")
+
+# Plotting deaths by age
+d = sum(subset(deaths, Age.group == "12-17")$Vaccinated.with.outcome)
+d1 = sum(subset(deaths, Age.group == "18-29")$Vaccinated.with.outcome)
+d2 = sum(subset(deaths, Age.group == "30-49")$Vaccinated.with.outcome)
+d3 = sum(subset(deaths, Age.group == "50-64")$Vaccinated.with.outcome)
+d4 = sum(subset(deaths, Age.group == "65-79")$Vaccinated.with.outcome)
+d5 = sum(subset(deaths, Age.group == "80+")$Vaccinated.with.outcome)
+deathagepie = data.frame(deaths=c(d,d1,d2,d3,d4,d5), ages= c("12-17","18-29","30-49","50-64","65-79","80+"))
+
+ggplot(deathagepie, aes(x="", y=deaths, fill=ages)) +
+  geom_col() +
+  coord_polar(theta = "y") +
+  geom_text(aes(label = deaths),
+            position = position_stack(vjust = 0.5)) +
+  labs(title="Deaths by age",
+                   caption="Source: CDC")+
+  theme_void()
 # Need to plot case and death rates over time
 
 # Need to get CDC data on hospitalizations and death characteristics. Over time would be excellent
