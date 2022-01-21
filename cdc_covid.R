@@ -86,7 +86,7 @@ u <- ggplot(graphcfr, aes(x=Vaccinated,y=Case.fatality.ratio)) + geom_boxplot(va
        y="Case Fatality Ratio")
 
 genfigure = ggarrange(v, u,
-                   ncol = 2)
+                   nrow = 2)
 genfigure
 
 # Plotting Deaths per 100k for vaccines
@@ -139,7 +139,7 @@ ln1 <-ggplot(allagescfr[allagescfr$Vaccine.product == "all_types",], aes(x=MMWR.
        x="MMWR Week",
        y="Case Fatality Ratio")
 
-adjcfr = as.data.frame((deaths[6]+deaths[8])/(deaths[7]+deaths[9]))
+adjcfr = as.data.frame((deaths[6]+deaths[8])/(snippedcases[6]+snippedcases[8]))
 colnames(adjcfr) = "Case.fatality.ratio"
 adjcfr = cbind.data.frame(deaths, adjcfr)
 
@@ -152,8 +152,32 @@ ln2 <-ggplot(adjcfr[adjcfr$Vaccine.product == "all_types",], aes(x=MMWR.week, y=
        x="MMWR Week",
        y="Case Fatality Ratio")
 
-cfrgrph = ggarrange(ln, ln1, ln2,
-                          ncol = 2, nrow = 2)
+adjcaserate = as.data.frame((cases[6]+cases[8])/(cases[7]+cases[9]))
+colnames(adjcaserate) = "Case.rate.allstatus"
+adjcaserate$Cases.per.100k = adjcaserate$Case.rate.allstatus*100000
+adjcaserate = cbind.data.frame(cases, adjcaserate)
+
+ln6 <-ggplot(adjcaserate[adjcaserate$Vaccine.product == "all_types",], aes(x=MMWR.week, y=Cases.per.100k, group=Age.group)) +
+  geom_line(aes(linetype=Age.group, color=Age.group))+
+  geom_point(aes(shape=Age.group, color=Age.group)) +
+  labs(title="Graph of Weekly Cases Per 100k by Age",
+       subtitle="All ages, adjusted.",
+       caption="Source: CDC",
+       x="MMWR Week",
+       y="Cases Per 100k")
+allagescaserate = caserate[caserate$Age.group == "all_ages_adj",]
+
+ln7 <-ggplot(allagescaserate[allagescaserate$Vaccine.product == "all_types",], aes(x=MMWR.week, y=Cases.per.100k, group=Vaccinated)) +
+  geom_line(aes(linetype=Vaccinated, color=Vaccinated))+
+  geom_point(aes(shape=Vaccinated, color=Vaccinated)) +
+  labs(title="Graph of Weekly Cases Per 100k by Vaccine Status",
+       subtitle="All ages, adjusted",
+       caption="Source: CDC",
+       x="MMWR Week",
+       y="Cases Per 100k")
+
+cfrgrph = ggarrange(ln, ln1, ln2, ln6, ln7,
+                          ncol = 3, nrow = 2)
 cfrgrph
 
 # Plotting weekly Deaths Per 100k
@@ -378,8 +402,4 @@ unvaxpie = ggarrange(p3, p4,
 unvaxpie
 
 chisq.test(unvaxdeathagepie$deaths, unvaxpopprob) # The distribution of unvaccinated deaths were also skewed older, although not as much.
-
-# Need to plot case and death rates over time
-
-# Need to get CDC data on hospitalizations and death characteristics. Over time would be excellent
 
