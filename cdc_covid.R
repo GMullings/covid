@@ -66,6 +66,7 @@ vaxcasefatalityratio$Vaccinated = "Yes"
 colnames(vaxcasefatalityratio) = c("month","MMWR.week","Age.group","Vaccine.product","Case.fatality.ratio","Vaccinated")
 
 deathsrate$Deaths.per.100k = deathsrate$Death.rate*100000
+caserate$Cases.per.100k = caserate$Case.rate*100000
 
 # Teens, 12-17
 teensvaxtypes = dataset[dataset$Vaccine.product == "all_types" & dataset$Age.group == "12-17",]
@@ -617,9 +618,27 @@ ggplot(deathagepie, aes(x="", y=deaths, fill=ages)) +
   coord_polar(theta = "y") +
   geom_text(aes(label = deaths),
             position = position_stack(vjust = 0.5)) +
-  labs(title="Deaths by age",
+  labs(title="Vaccinated deaths by age",
                    caption="Source: CDC")+
   theme_void()
+
+du = sum(subset(deaths, Age.group == "12-17")$Unvaccinated.with.outcome)
+du1 = sum(subset(deaths, Age.group == "18-29")$Unvaccinated.with.outcome)
+du2 = sum(subset(deaths, Age.group == "30-49")$Unvaccinated.with.outcome)
+du3 = sum(subset(deaths, Age.group == "50-64")$Unvaccinated.with.outcome)
+du4 = sum(subset(deaths, Age.group == "65-79")$Unvaccinated.with.outcome)
+du5 = sum(subset(deaths, Age.group == "80+")$Unvaccinated.with.outcome)
+unvaxdeathagepie = data.frame(deaths=c(du,du1,du2,du3,du4,du5), ages= c("12-17","18-29","30-49","50-64","65-79","80+"))
+
+ggplot(unvaxdeathagepie, aes(x="", y=deaths, fill=ages)) +
+  geom_col() +
+  coord_polar(theta = "y") +
+  geom_text(aes(label = deaths),
+            position = position_stack(vjust = 0.5)) +
+  labs(title="Unvaccinated deaths by age",
+       caption="Source: CDC")+
+  theme_void()
+
 # Need to plot case and death rates over time
 
 # Need to get CDC data on hospitalizations and death characteristics. Over time would be excellent
