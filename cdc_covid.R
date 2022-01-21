@@ -604,7 +604,7 @@ wilcox.test(subset(unvaxdeathrate, Age.group == "30-49")$Deaths.per.100k, subset
 wilcox.test(subset(unvaxdeathrate, Age.group == "80+")$Deaths.per.100k, subset(vaxdeathrate, Age.group == "80+")$Deaths.per.100k, paired=TRUE)
 wilcox.test(subset(unvaxdeathrate, Age.group == "80+")$Deaths.per.100k, subset(vaxdeathrate, Age.group == "80+")$Deaths.per.100k, paired=TRUE, alternative="greater")
 
-# Plotting deaths by age
+# Plotting deaths by age (Vax vs Unvax) with Chi-sq test of deaths vs population
 d = sum(subset(deaths, Age.group == "12-17")$Vaccinated.with.outcome)
 d1 = sum(subset(deaths, Age.group == "18-29")$Vaccinated.with.outcome)
 d2 = sum(subset(deaths, Age.group == "30-49")$Vaccinated.with.outcome)
@@ -613,7 +613,16 @@ d4 = sum(subset(deaths, Age.group == "65-79")$Vaccinated.with.outcome)
 d5 = sum(subset(deaths, Age.group == "80+")$Vaccinated.with.outcome)
 deathagepie = data.frame(deaths=c(d,d1,d2,d3,d4,d5), ages= c("12-17","18-29","30-49","50-64","65-79","80+"))
 
-ggplot(deathagepie, aes(x="", y=deaths, fill=ages)) +
+da = mean(subset(deaths, Age.group == "12-17")$Fully.vaccinated.population)
+da1 = mean(subset(deaths, Age.group == "18-29")$Fully.vaccinated.population)
+da2 = mean(subset(deaths, Age.group == "30-49")$Fully.vaccinated.population)
+da3 = mean(subset(deaths, Age.group == "50-64")$Fully.vaccinated.population)
+da4 = mean(subset(deaths, Age.group == "65-79")$Fully.vaccinated.population)
+da5 = mean(subset(deaths, Age.group == "80+")$Fully.vaccinated.population)
+vaxpopdist = data.frame(Population=c(da,da1,da2,da3,da4,da5), ages= c("12-17","18-29","30-49","50-64","65-79","80+"), Vaccinated="Yes")
+vaxpopprob = c(da,da1,da2,da3,da4,da5)/sum(da,da1,da2,da3,da4,da5)
+
+p1 = ggplot(deathagepie, aes(x="", y=deaths, fill=ages)) +
   geom_col() +
   coord_polar(theta = "y") +
   geom_text(aes(label = deaths),
@@ -621,6 +630,20 @@ ggplot(deathagepie, aes(x="", y=deaths, fill=ages)) +
   labs(title="Vaccinated deaths by age",
                    caption="Source: CDC")+
   theme_void()
+
+p2 = ggplot(vaxpopdist, aes(x="", y=Population, fill=ages)) +
+  geom_col() +
+  coord_polar(theta = "y") +
+  labs(title="Vaccinated by age",
+       caption="Source: CDC")+
+  theme_void()
+
+vaxpie = ggarrange(p1, p2,
+          ncol = 2)
+vaxpie
+
+chisq.test(deathagepie$deaths, vaxpopprob) # The distribution of vaccinated deaths were significantly skewed toward the elderly vs. vaccinated population distribution.
+
 
 du = sum(subset(deaths, Age.group == "12-17")$Unvaccinated.with.outcome)
 du1 = sum(subset(deaths, Age.group == "18-29")$Unvaccinated.with.outcome)
@@ -630,7 +653,16 @@ du4 = sum(subset(deaths, Age.group == "65-79")$Unvaccinated.with.outcome)
 du5 = sum(subset(deaths, Age.group == "80+")$Unvaccinated.with.outcome)
 unvaxdeathagepie = data.frame(deaths=c(du,du1,du2,du3,du4,du5), ages= c("12-17","18-29","30-49","50-64","65-79","80+"))
 
-ggplot(unvaxdeathagepie, aes(x="", y=deaths, fill=ages)) +
+dau = mean(subset(deaths, Age.group == "12-17")$Unvaccinated.population)
+dau1 = mean(subset(deaths, Age.group == "18-29")$Unvaccinated.population)
+dau2 = mean(subset(deaths, Age.group == "30-49")$Unvaccinated.population)
+dau3 = mean(subset(deaths, Age.group == "50-64")$Unvaccinated.population)
+dau4 = mean(subset(deaths, Age.group == "65-79")$Unvaccinated.population)
+dau5 = mean(subset(deaths, Age.group == "80+")$Unvaccinated.population)
+unvaxpopdist = data.frame(Population=c(dau,dau1,dau2,dau3,dau4,dau5), ages= c("12-17","18-29","30-49","50-64","65-79","80+"), Vaccinated="No")
+unvaxpopprob = c(dau,dau1,dau2,dau3,dau4,dau5)/sum(dau,dau1,dau2,dau3,dau4,dau5)
+
+p3 = ggplot(unvaxdeathagepie, aes(x="", y=deaths, fill=ages)) +
   geom_col() +
   coord_polar(theta = "y") +
   geom_text(aes(label = deaths),
@@ -638,6 +670,19 @@ ggplot(unvaxdeathagepie, aes(x="", y=deaths, fill=ages)) +
   labs(title="Unvaccinated deaths by age",
        caption="Source: CDC")+
   theme_void()
+
+p4 = ggplot(unvaxpopdist, aes(x="", y=Population, fill=ages)) +
+  geom_col() +
+  coord_polar(theta = "y") +
+  labs(title="Unvaccinated by age",
+       caption="Source: CDC")+
+  theme_void()
+
+unvaxpie = ggarrange(p3, p4,
+                   ncol = 2)
+unvaxpie
+
+chisq.test(unvaxdeathagepie$deaths, unvaxpopprob) # The distribution of unvaccinated deaths were also skewed older, although not as much.
 
 # Need to plot case and death rates over time
 
