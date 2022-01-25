@@ -9,6 +9,11 @@ library("ggpubr")
 
 filename <- "Rates_of_COVID-19_Cases_or_Deaths_by_Age_Group_and_Vaccination_Status.csv"
 dataset <- read.csv(filename)
+# Jan 21 2022 update: CDC changed MMWR week coding, the below line removes the "2021" value at the start of every entry.
+dataset$MMWR.week = dataset$MMWR.week-202100
+# End of Jan 21 2022 update
+dataset = dataset[order(dataset$MMWR.week),]
+head(dataset)
 dim(dataset)
 sapply(dataset, class)
 levels(dataset$outcome)
@@ -262,7 +267,7 @@ shapiro.test(subset(unvaxcasefatalityratio, Age.group == "80+")$Case.fatality.ra
 
 # All that are normally distributed are given a T-test.
 t.test(unvaxcasefatalityratio$Case.fatality.ratio, vaxcasefatalityratio$Case.fatality.ratio, paired=TRUE) # Significant difference between vaccinated and unvaccinated CFRs.
-t.test(subset(unvaxcasefatalityratio, Age.group == "12-17")$Case.fatality.ratio, subset(vaxcasefatalityratio, Age.group == "12-17")$Case.fatality.ratio, paired=TRUE) # Significant difference between vaccinated and unvaccinated CFRs.
+t.test(subset(unvaxcasefatalityratio, Age.group == "12-17")$Case.fatality.ratio, subset(vaxcasefatalityratio, Age.group == "12-17")$Case.fatality.ratio, paired=TRUE) # Barely significant difference between vaccinated and unvaccinated CFRs.
 
 # Wilcox test for the abnormals
 wilcox.test(subset(unvaxcasefatalityratio, Age.group == "18-29")$Case.fatality.ratio, subset(vaxcasefatalityratio, Age.group == "18-29")$Case.fatality.ratio, paired=TRUE) # Significant difference
@@ -284,8 +289,7 @@ shapiro.test(subset(vaxdeathrate, Vaccine.product == "Pfizer")$Deaths.per.100k)
 # T-Test is appropriate
 t.test(subset(vaxdeathrate, Vaccine.product == "Janssen")$Deaths.per.100k, subset(vaxdeathrate, Vaccine.product == "Moderna")$Deaths.per.100k, paired=TRUE) # Significant difference
 t.test(subset(vaxdeathrate, Vaccine.product == "Janssen")$Deaths.per.100k, subset(vaxdeathrate, Vaccine.product == "Moderna")$Deaths.per.100k, paired=TRUE, alternative="greater") # Janssen deaths per 100k are significantly higher.
-t.test(subset(vaxdeathrate, Vaccine.product == "Pfizer")$Deaths.per.100k, subset(vaxdeathrate, Vaccine.product == "Moderna")$Deaths.per.100k, paired=TRUE) # Significant difference
-t.test(subset(vaxdeathrate, Vaccine.product == "Pfizer")$Deaths.per.100k, subset(vaxdeathrate, Vaccine.product == "Moderna")$Deaths.per.100k, paired=TRUE, alternative = "greater") # Pfizer deaths per 100k are significantly higher.
+t.test(subset(vaxdeathrate, Vaccine.product == "Pfizer")$Deaths.per.100k, subset(vaxdeathrate, Vaccine.product == "Moderna")$Deaths.per.100k, paired=TRUE) # Insignificant difference
 t.test(subset(vaxdeathrate, Vaccine.product == "Pfizer")$Deaths.per.100k, subset(vaxdeathrate, Vaccine.product == "Janssen")$Deaths.per.100k, paired=TRUE) # Significant difference
 t.test(subset(vaxdeathrate, Vaccine.product == "Pfizer")$Deaths.per.100k, subset(vaxdeathrate, Vaccine.product == "Janssen")$Deaths.per.100k, paired=TRUE, alternative = "less") # Pfizer deaths per 100k are significantly lower.
 
@@ -294,10 +298,10 @@ unvaxdeathrate = deathsrate[deathsrate$Vaccinated == "No",]
 shapiro.test(vaxdeathrate$Deaths.per.100k)
 shapiro.test(unvaxdeathrate$Deaths.per.100k)
 shapiro.test(subset(vaxdeathrate, Age.group == "12-17")$Deaths.per.100k)
-shapiro.test(subset(unvaxdeathrate, Age.group == "12-17")$Deaths.per.100k)
+shapiro.test(subset(unvaxdeathrate, Age.group == "12-17")$Deaths.per.100k) # Not normally distributed, will use a wilcox test.
 shapiro.test(subset(vaxdeathrate, Age.group == "18-29")$Deaths.per.100k)
 shapiro.test(subset(unvaxdeathrate, Age.group == "18-29")$Deaths.per.100k)
-shapiro.test(subset(vaxdeathrate, Age.group == "30-49")$Deaths.per.100k) # Not normally distributed, will use a wilcox test.
+shapiro.test(subset(vaxdeathrate, Age.group == "30-49")$Deaths.per.100k)
 shapiro.test(subset(unvaxdeathrate, Age.group == "30-49")$Deaths.per.100k)
 shapiro.test(subset(vaxdeathrate, Age.group == "50-64")$Deaths.per.100k)
 shapiro.test(subset(unvaxdeathrate, Age.group == "50-64")$Deaths.per.100k) 
@@ -308,18 +312,18 @@ shapiro.test(subset(unvaxdeathrate, Age.group == "80+")$Deaths.per.100k) # Not n
 
 # T-Test where appropriate
 t.test(unvaxdeathrate$Deaths.per.100k, vaxdeathrate$Deaths.per.100k, paired=TRUE) # Significantly different death rates
-t.test(subset(unvaxdeathrate, Age.group == "12-17")$Deaths.per.100k, subset(vaxdeathrate, Age.group == "12-17")$Deaths.per.100k, paired=TRUE)
-t.test(subset(unvaxdeathrate, Age.group == "12-17")$Deaths.per.100k, subset(vaxdeathrate, Age.group == "12-17")$Deaths.per.100k, paired=TRUE, alternative="greater") #Unvaxxed rate is significantly higher
 t.test(subset(unvaxdeathrate, Age.group == "18-29")$Deaths.per.100k, subset(vaxdeathrate, Age.group == "18-29")$Deaths.per.100k, paired=TRUE)
 t.test(subset(unvaxdeathrate, Age.group == "18-29")$Deaths.per.100k, subset(vaxdeathrate, Age.group == "18-29")$Deaths.per.100k, paired=TRUE, alternative = "greater") #Unvaxxed rate is significantly higher
+t.test(subset(unvaxdeathrate, Age.group == "30-49")$Deaths.per.100k, subset(vaxdeathrate, Age.group == "30-49")$Deaths.per.100k, paired=TRUE)
+t.test(subset(unvaxdeathrate, Age.group == "30-49")$Deaths.per.100k, subset(vaxdeathrate, Age.group == "30-49")$Deaths.per.100k, paired=TRUE, alternative="greater")
 t.test(subset(unvaxdeathrate, Age.group == "50-64")$Deaths.per.100k, subset(vaxdeathrate, Age.group == "50-64")$Deaths.per.100k, paired=TRUE)
 t.test(subset(unvaxdeathrate, Age.group == "50-64")$Deaths.per.100k, subset(vaxdeathrate, Age.group == "50-64")$Deaths.per.100k, paired=TRUE, alternative = "greater") #Unvaxxed rate is significantly higher
 t.test(subset(unvaxdeathrate, Age.group == "65-79")$Deaths.per.100k, subset(vaxdeathrate, Age.group == "65-79")$Deaths.per.100k, paired=TRUE)
 t.test(subset(unvaxdeathrate, Age.group == "65-79")$Deaths.per.100k, subset(vaxdeathrate, Age.group == "65-79")$Deaths.per.100k, paired=TRUE, alternative = "greater") #Unvaxxed rate is significantly higher
 
 # Wilcox tests for the abnormals
-wilcox.test(subset(unvaxdeathrate, Age.group == "30-49")$Deaths.per.100k, subset(vaxdeathrate, Age.group == "30-49")$Deaths.per.100k, paired=TRUE)
-wilcox.test(subset(unvaxdeathrate, Age.group == "30-49")$Deaths.per.100k, subset(vaxdeathrate, Age.group == "30-49")$Deaths.per.100k, paired=TRUE, alternative = "greater") #Unvaxxed rate is significantly higher
+wilcox.test(subset(unvaxdeathrate, Age.group == "12-17")$Deaths.per.100k, subset(vaxdeathrate, Age.group == "12-17")$Deaths.per.100k, paired=TRUE)
+wilcox.test(subset(unvaxdeathrate, Age.group == "12-17")$Deaths.per.100k, subset(vaxdeathrate, Age.group == "12-17")$Deaths.per.100k, paired=TRUE, alternative ="greater")
 wilcox.test(subset(unvaxdeathrate, Age.group == "80+")$Deaths.per.100k, subset(vaxdeathrate, Age.group == "80+")$Deaths.per.100k, paired=TRUE)
 wilcox.test(subset(unvaxdeathrate, Age.group == "80+")$Deaths.per.100k, subset(vaxdeathrate, Age.group == "80+")$Deaths.per.100k, paired=TRUE, alternative="greater")
 
