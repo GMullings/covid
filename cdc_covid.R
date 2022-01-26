@@ -123,7 +123,7 @@ gen100kfig = ggarrange(v100k, u100k, age100k,
                        ncol = 2, nrow=2)
 gen100kfig
 
-# Plotting weekly Case Fatality Ratios, seems seasonal
+# Plotting weekly Case Fatality Ratios
 allagescfr = casefatalityratio[casefatalityratio$Age.group == "all_ages_adj",]
 
 ln <-ggplot(allagescfr[allagescfr$Vaccinated == "Yes",], aes(x=MMWR.week, y=Case.fatality.ratio, group=Vaccine.product)) +
