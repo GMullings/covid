@@ -5,9 +5,15 @@ date: "Updated: 1/25/2022"
 output: html_document
 ---
 
-Executive Summary:
+**Executive Summary:**
 
-Intro:
+This analysis of CDC COVID-19 weekly cases and mortality data spans April - December, 2021. Vaccination status is a statistically significant determinant of mortality outcomes with COVID-19 with the unvaccinated showing consistently higher negative outcomes. This finding is robust to age although younger cohorts exhibit smaller and less statistically significant benefits from vaccination. The analysis pays particular attention to Case Fatality Ratios (CFRs) and Deaths per 100,000 between the vaccinated and unvaccinated as well as between the Moderna, J&J's Janssen, and Pfizer's vaccine products. CFRs are nearly 1.95x higher among the unvaccinated with both rates below 5%. Mortality rates are over 9x higher among the unvaccinated although for both groups COVID-19 poses less of a threat to their lives than either motor vehicle operation or Influenza. CFRs are higher among Moderna users versus other vaccine products while Deaths per 100,000 are higher among Janssen users. Graphs of critical measures over time are provided.
+
+**Intro:**
+
+Since COVID-19 was publicly discovered in late December 2019 illness severity and death risks from the virus have been clearly segmented by age, with the oldest more likely to suffer and die from infection. Since March 2020 data from the CDC on patient conditions suggested that pre-existing conditions status and quantity also defined risk profiles. After the emergence of COVID-19 vaccines in 2021 a person's vaccination status has a demonstrable impact on mortality risks. 
+
+The CDC publishes weekly data on cases and deaths in 2021 with data starting in April, every month. The data segments both cases and deaths by vaccination status, vaccine product type (Janssen, Moderna, Pfizer, or all), and age bracket (12-17, 18-29, 30-49, 50-64, 65-79, 80+, or all adjusted). In light of what is known about COVID-19's risk profile this data offers insight into who is disproportionately suffering from symptomatic infection and death along age and vaccination deliniations.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(warning = FALSE, message = FALSE) # Turns off warning messages
@@ -32,8 +38,10 @@ colnames(vaxdeathrate) = "Death.rate"
 vaxdeathrate$Vaccinated = "Yes"
 colnames(unvaxdeathrate) = "Death.rate"
 unvaxdeathrate$Vaccinated = "No"
-vaxdeathrate = cbind.data.frame(deaths,vaxdeathrate)
-unvaxdeathrate = cbind.data.frame(deaths,unvaxdeathrate)
+vaxdeathrate = cbind.data.frame(deaths[1:7],vaxdeathrate)
+colnames(vaxdeathrate) = c("outcome", "month", "MMWR.week", "Age.group", "Vaccine.product", "With.outcome", "Population", "Death.rate", "Vaccinated")
+unvaxdeathrate = cbind.data.frame(deaths[1:5],deaths[8:9],unvaxdeathrate)
+colnames(unvaxdeathrate) = c("outcome", "month", "MMWR.week", "Age.group", "Vaccine.product", "With.outcome", "Population", "Death.rate", "Vaccinated")
 deathsrate = rbind.data.frame(unvaxdeathrate,vaxdeathrate)
 
 vaxcaserate = cases[6]/cases[7]
@@ -58,17 +66,78 @@ colnames(vaxcasefatalityratio) = c("month","MMWR.week","Age.group","Vaccine.prod
 
 deathsrate$Deaths.per.100k = deathsrate$Death.rate*100000
 caserate$Cases.per.100k = caserate$Case.rate*100000
+
+vaxtypecasefatalityratio = subset(vaxcasefatalityratio, Vaccine.product %in% c("Janssen","Moderna","Pfizer"))
+casefatalityratio = rbind.data.frame(unvaxcasefatalityratio, vaxcasefatalityratio)
+graphcfr = casefatalityratio[casefatalityratio$Vaccine.product == "all_types",]
+
+allagescfr = casefatalityratio[casefatalityratio$Age.group == "all_ages_adj",]
+
+adjcfr = as.data.frame((deaths[6]+deaths[8])/(snippedcases[6]+snippedcases[8]))
+colnames(adjcfr) = "Case.fatality.ratio"
+adjcfr = cbind.data.frame(deaths, adjcfr)
+
+adjcaserate = as.data.frame((cases[6]+cases[8])/(cases[7]+cases[9]))
+colnames(adjcaserate) = "Case.rate.allstatus"
+adjcaserate$Cases.per.100k = adjcaserate$Case.rate.allstatus*100000
+adjcaserate = cbind.data.frame(cases, adjcaserate)
+
+allagescaserate = caserate[caserate$Age.group == "all_ages_adj",]
+
+vaxdeathrate = deathsrate[deathsrate$Vaccinated == "Yes",]
+unvaxdeathrate = deathsrate[deathsrate$Vaccinated == "No",]
+vaxdeathshundredtype = subset(vaxdeathrate, Vaccine.product %in% c("Janssen","Moderna","Pfizer"))
+
+allagesd100k = deathsrate[deathsrate$Age.group == "all_ages_adj",]
+vaxallages100k = allagesd100k[allagesd100k$Vaccinated == "Yes",]
+adjallagesd100k = allagesd100k[allagesd100k$Vaccine.product=="all_types",]
+
+adjdeathsrate = as.data.frame((deaths[6]+deaths[8])/(deaths[7]+deaths[9]))
+colnames(adjdeathsrate) = "Death.rate.allstatus"
+adjdeathsrate$Deaths.per.100k = adjdeathsrate$Death.rate.allstatus*100000
+adjdeathsrate = cbind.data.frame(deaths, adjdeathsrate)
+
+pfizercfr = allagescfr[allagescfr$Vaccine.product == "Pfizer",]
+mdrnacfr = allagescfr[allagescfr$Vaccine.product == "Moderna",]
+jajcfr = allagescfr[allagescfr$Vaccine.product == "Janssen",]
+pfizercfr = pfizercfr[pfizercfr$Vaccinated == "Yes",]
+mdrnacfr = mdrnacfr[mdrnacfr$Vaccinated == "Yes",]
+jajcfr = jajcfr[jajcfr$Vaccinated == "Yes",]
+
+d = sum(subset(deaths, Age.group == "12-17")$Vaccinated.with.outcome)
+d1 = sum(subset(deaths, Age.group == "18-29")$Vaccinated.with.outcome)
+d2 = sum(subset(deaths, Age.group == "30-49")$Vaccinated.with.outcome)
+d3 = sum(subset(deaths, Age.group == "50-64")$Vaccinated.with.outcome)
+d4 = sum(subset(deaths, Age.group == "65-79")$Vaccinated.with.outcome)
+d5 = sum(subset(deaths, Age.group == "80+")$Vaccinated.with.outcome)
+
+du = sum(subset(deaths, Age.group == "12-17")$Unvaccinated.with.outcome)
+du1 = sum(subset(deaths, Age.group == "18-29")$Unvaccinated.with.outcome)
+du2 = sum(subset(deaths, Age.group == "30-49")$Unvaccinated.with.outcome)
+du3 = sum(subset(deaths, Age.group == "50-64")$Unvaccinated.with.outcome)
+du4 = sum(subset(deaths, Age.group == "65-79")$Unvaccinated.with.outcome)
+du5 = sum(subset(deaths, Age.group == "80+")$Unvaccinated.with.outcome)
+
+deathagepie = data.frame(deaths=c(d,d1,d2,d3,d4,d5), ages= c("12-17","18-29","30-49","50-64","65-79","80+"))
+unvaxdeathagepie = data.frame(deaths=c(du,du1,du2,du3,du4,du5), ages= c("12-17","18-29","30-49","50-64","65-79","80+"))
+
+da = mean(subset(deaths, Age.group == "12-17")$Fully.vaccinated.population)
+da1 = mean(subset(deaths, Age.group == "18-29")$Fully.vaccinated.population)
+da2 = mean(subset(deaths, Age.group == "30-49")$Fully.vaccinated.population)
+da3 = mean(subset(deaths, Age.group == "50-64")$Fully.vaccinated.population)
+da4 = mean(subset(deaths, Age.group == "65-79")$Fully.vaccinated.population)
+da5 = mean(subset(deaths, Age.group == "80+")$Fully.vaccinated.population)
+vaxpopdist = data.frame(Population=c(da,da1,da2,da3,da4,da5), ages= c("12-17","18-29","30-49","50-64","65-79","80+"), Vaccinated="Yes")
+
 ```
+
+**Data Exploration**
 
 According to the University of North Carolina's Gillings School of Global Public Health the Case Fatality Ratio is the, "proportion of people recorded as confirmed COVID-19 cases who die from COVID-19." It can, "be approximated by dividing the number of deaths by the number of confirmed cases." CFRs are commonly used to measure the lethality of acute infectious disease, which at this point seems to be an appropriate description of COVID-19.
 
 The following are boxplots of Case Fatality Ratios for 2021 COVID-19 CDC data starting with MMWR Week 14, the first week of April. The top graph plots CFRs by vaccine product (categories include "Janssen" fro J&J, "Moderna," and "Pfizer") and the bottom graph plots CFRs by vaccination status and age.
 
 ```{r CFRs, echo=FALSE, warnings=FALSE}
-vaxtypecasefatalityratio = subset(vaxcasefatalityratio, Vaccine.product %in% c("Janssen","Moderna","Pfizer"))
-casefatalityratio = rbind.data.frame(unvaxcasefatalityratio, vaxcasefatalityratio)
-graphcfr = casefatalityratio[casefatalityratio$Vaccine.product == "all_types",]
-
 v <- ggplot(vaxtypecasefatalityratio, aes(x=Vaccine.product,y=Case.fatality.ratio)) + geom_boxplot(varwidth=T, fill="plum") +
 labs(title="Box plot of Vaccinated Case Fatality Ratios",
 subtitle="By Vaccination Product Type",
@@ -89,11 +158,9 @@ u
 v
 ```
 
-The below are similar breakdowns of the weekly CFRs from April - December of 2021. Also included are weekly cases per 100,000 for the same time period.
+The below are similar breakdowns of the weekly CFRs from April - December of 2021. Also included are weekly cases per 100,000 for the same time period. For reference 1,000 cases would be equivalent to a 1% weekly case rate.
 
 ```{r CFRs time, echo=FALSE, warnings=FALSE}
-allagescfr = casefatalityratio[casefatalityratio$Age.group == "all_ages_adj",]
-
 ln <-ggplot(allagescfr[allagescfr$Vaccinated == "Yes",], aes(x=MMWR.week, y=Case.fatality.ratio, group=Vaccine.product)) +
 geom_line(aes(linetype=Vaccine.product, color=Vaccine.product))+
 geom_point(aes(shape=Vaccine.product, color=Vaccine.product)) +
@@ -112,10 +179,6 @@ ln1 <-ggplot(allagescfr[allagescfr$Vaccine.product == "all_types",], aes(x=MMWR.
        x="MMWR Week",
        y="Case Fatality Ratio")
 
-adjcfr = as.data.frame((deaths[6]+deaths[8])/(snippedcases[6]+snippedcases[8]))
-colnames(adjcfr) = "Case.fatality.ratio"
-adjcfr = cbind.data.frame(deaths, adjcfr)
-
 ln2 <-ggplot(adjcfr[adjcfr$Vaccine.product == "all_types",], aes(x=MMWR.week, y=Case.fatality.ratio, group=Age.group)) +
   geom_line(aes(linetype=Age.group, color=Age.group))+
   geom_point(aes(shape=Age.group, color=Age.group)) +
@@ -125,11 +188,6 @@ ln2 <-ggplot(adjcfr[adjcfr$Vaccine.product == "all_types",], aes(x=MMWR.week, y=
        x="MMWR Week",
        y="Case Fatality Ratio")
 
-adjcaserate = as.data.frame((cases[6]+cases[8])/(cases[7]+cases[9]))
-colnames(adjcaserate) = "Case.rate.allstatus"
-adjcaserate$Cases.per.100k = adjcaserate$Case.rate.allstatus*100000
-adjcaserate = cbind.data.frame(cases, adjcaserate)
-
 ln6 <-ggplot(adjcaserate[adjcaserate$Vaccine.product == "all_types",], aes(x=MMWR.week, y=Cases.per.100k, group=Age.group)) +
   geom_line(aes(linetype=Age.group, color=Age.group))+
   geom_point(aes(shape=Age.group, color=Age.group)) +
@@ -138,7 +196,6 @@ ln6 <-ggplot(adjcaserate[adjcaserate$Vaccine.product == "all_types",], aes(x=MMW
        caption="Source: CDC",
        x="MMWR Week",
        y="Cases Per 100k")
-allagescaserate = caserate[caserate$Age.group == "all_ages_adj",]
 
 ln7 <-ggplot(allagescaserate[allagescaserate$Vaccine.product == "all_types",], aes(x=MMWR.week, y=Cases.per.100k, group=Vaccinated)) +
   geom_line(aes(linetype=Vaccinated, color=Vaccinated))+
@@ -158,16 +215,13 @@ ln6
 ln7
 ```
 
-Deaths per 100,000 is a practical way to express the raw mortality rate of a disease. Mortality rates normalize comparisons of death between groups by controlling for the difference between the size of the populations. Because of the low digits typically associated with measuring particular disease mortality in large populations, a figure like 100,000 is used as the base population comparison. For reference, 1000 deaths per 100,000 would be equivalent to a 1% death rate.
+Deaths per 100,000 is a practical way to express the raw mortality rate of a disease. Mortality rates normalize comparisons of death between groups by controlling for the difference between the size of the populations. Because of the low digits typically associated with measuring particular disease mortality in large populations, a figure like 100,000 is used as the base population comparison. For reference, 1000 deaths per 100,000 would be equivalent to a 1% death rate. As practical references according to the CDC in 2020 there were 14.7 deaths per 100,000 Americans from motor vehicle traffic with an annual average rate of 14 between 2015 and 2020, and Influenza and Pneumonia had a rate of 19.8 in 2020 with an average of 20.4 between 2015 and 2020.
 
-The death rate for COVID-19 is arguably the most cited statistic in discussing vaccination status. In this case the death rate is calculated by vaccination status population. In other words the death rate for vaccinated observations is the number of vaccinated deaths divded by the number of vaccinated Americans.
+Of the 124,406 killed by COVID-19 in 2021 since vaccination-status tracking by the CDC (according to the CDC as of Jan 21, 2022) just over 19% were vaccinated. The death rate for COVID-19 is arguably the most cited statistic in discussing vaccination status. In this case the death rate is calculated by vaccination status population. In other words the death rate for vaccinated observations is the number of vaccinated deaths divded by the number of vaccinated Americans.
 
 The following are boxplots of Deaths Per 100,000 for most of 2021 (minus the last three weeks) COVID-19 CDC data starting with MMWR Week 14, the first week of April. The top graph plots death rates by vaccine product (categories include "Janssen" fro J&J, "Moderna," and "Pfizer") and the bottom graph plots death rates by vaccination status and age.
 
 ```{r deathrates, echo=FALSE}
-vaxdeathrate = deathsrate[deathsrate$Vaccinated == "Yes",]
-vaxdeathshundredtype = subset(vaxdeathrate, Vaccine.product %in% c("Janssen","Moderna","Pfizer"))
-
 v100k <- ggplot(vaxdeathshundredtype, aes(x=Vaccine.product,y=Deaths.per.100k)) + geom_boxplot(varwidth=T, fill="plum") +
   labs(title="Box plot of Vaccinated Deaths Per 100k",
        subtitle="By Vaccination Product Type",
@@ -199,10 +253,6 @@ age100k
 The below are similar breakdowns of the weekly death rates from April - December of 2021. 
 
 ```{r death rates time, echo=FALSE, warnings=FALSE}
-allagesd100k = deathsrate[deathsrate$Age.group == "all_ages_adj",]
-vaxallages100k = allagesd100k[allagesd100k$Vaccinated == "Yes",]
-adjallagesd100k = allagesd100k[allagesd100k$Vaccine.product=="all_types",]
-
 ln3 <-ggplot(vaxallages100k, aes(x=MMWR.week, y=Deaths.per.100k, group=Vaccine.product)) +
   geom_line(aes(linetype=Vaccine.product, color=Vaccine.product))+
   geom_point(aes(shape=Vaccine.product, color=Vaccine.product)) +
@@ -221,11 +271,6 @@ ln4 <-ggplot(adjallagesd100k, aes(x=MMWR.week, y=Deaths.per.100k, group=Vaccinat
        x="MMWR Week",
        y="Deaths Per 100k")
 
-adjdeathsrate = as.data.frame((deaths[6]+deaths[8])/(deaths[7]+deaths[9]))
-colnames(adjdeathsrate) = "Death.rate.allstatus"
-adjdeathsrate$Deaths.per.100k = adjdeathsrate$Death.rate.allstatus*100000
-adjdeathsrate = cbind.data.frame(deaths, adjdeathsrate)
-
 ln5 <-ggplot(adjdeathsrate[adjdeathsrate$Vaccine.product == "all_types",], aes(x=MMWR.week, y=Deaths.per.100k, group=Age.group)) +
   geom_line(aes(linetype=Age.group, color=Age.group))+
   geom_point(aes(shape=Age.group, color=Age.group)) +
@@ -243,4 +288,84 @@ ln4
 ln5
 ```
 
-Hypothesis 1:
+**Are Case Fatality Ratios stable between vaccine products?**
+
+Differences in Case Fatality Ratios between vaccine products are important to discerning the effectiveness of any given vaccine product. The CFR distribution visually differs between vaccines. Because most of the CFRs are not normally distributed within vaccine types a Wilcox test was conducted to test for statistically significant differences between vaccine types. The results are provided below:
+
+```{r CFR vaccine product stability Janssen vs Pfizer, echo=FALSE, warnings=FALSE}
+
+wilcox.test(jajcfr$Case.fatality.ratio, pfizercfr$Case.fatality.ratio, paired=TRUE)
+```
+
+A Wilcox test is used due to abnormal CFR distributions. The reults support that J&J's Janssen and Pfizer's vaccines have statistically similar CFRs.
+
+```{r CFR vaccine product stability Moderna vs Pfizer, echo=FALSE, warnings=FALSE}
+wilcox.test(mdrnacfr$Case.fatality.ratio, pfizercfr$Case.fatality.ratio, paired=TRUE) # Low p-value indicates significant difference. Moderna and Pfizer's CFRs are significantly different
+wilcox.test(mdrnacfr$Case.fatality.ratio, pfizercfr$Case.fatality.ratio, paired=TRUE, alternative="greater") # Moderna's CFR is significantly higher than Pfizer's
+```
+
+Moderna's CFR seems to be significantly higher than Pfizer's.
+
+```{r CFR vaccine product stability Moderna vs Janssen, echo=FALSE, warnings=FALSE}
+wilcox.test(jajcfr$Case.fatality.ratio, mdrnacfr$Case.fatality.ratio, paired=TRUE) # Significant difference between Moderna and J&J
+wilcox.test(jajcfr$Case.fatality.ratio, mdrnacfr$Case.fatality.ratio, paired=TRUE, alternative="less")
+```
+
+J&J's Janssen's CFR is, similarly to Pfizer's, significantly less than Moderna's.
+
+**Are mortality rates stable between vaccine products?**
+
+Differences in mortality rates, similar to case fatality ratios, are important for evaluating vaccine efficacy and seems to matter upon visual inspection of the boxplots.
+
+Moderna and Pfizer's vaccines have statistically similar mortality rates. Notably though J&J's Janssen vaccine has mortality rates significantly higher than both its US competitors.
+
+```{r CFR mortality vaccine, echo=FALSE, warnings=FALSE}
+t.test(subset(vaxdeathrate, Vaccine.product == "Janssen")$Deaths.per.100k, subset(vaxdeathrate, Vaccine.product == "Moderna")$Deaths.per.100k, paired=TRUE)
+t.test(subset(vaxdeathrate, Vaccine.product == "Janssen")$Deaths.per.100k, subset(vaxdeathrate, Vaccine.product == "Moderna")$Deaths.per.100k, paired=TRUE, alternative="greater")
+t.test(subset(vaxdeathrate, Vaccine.product == "Pfizer")$Deaths.per.100k, subset(vaxdeathrate, Vaccine.product == "Janssen")$Deaths.per.100k, paired=TRUE)
+t.test(subset(vaxdeathrate, Vaccine.product == "Pfizer")$Deaths.per.100k, subset(vaxdeathrate, Vaccine.product == "Janssen")$Deaths.per.100k, paired=TRUE, alternative = "less")
+```
+
+Janssen has an almost 70% higher death rate than the mRNA vaccines which have about 0.62 to 0.67 deaths per 100,000 vaccinated.
+
+**Are Case Fatality Ratios different based on vaccination status within age groups?**
+
+There are clear differences over time between CFRs based on vaccination status. Average case fatality ratios in the dataset were nearly twice as high for the unvaccinated who averaged 3.5%. What isn't as clear visually is whether there are differences between every age group, and particularly below 50.
+
+The difference between vaccinated and unvaccinated CFRs is statistically significant. 
+
+```{r CFR vaccinated vs unvaccinated, echo=FALSE, warnings=FALSE}
+t.test(unvaxcasefatalityratio$Case.fatality.ratio, vaxcasefatalityratio$Case.fatality.ratio, paired=TRUE)
+```
+
+So is the difference among 12-17 year olds, with the unvaccinated having higher CFRs, below. The average difference between the CFRs of vaccinated and unvaccinated in this age group though is less than 1% of the difference between the total vaccinated and unvaccinated population though.
+
+```{r CFR 12-17, echo=FALSE, warnings=FALSE}
+t.test(subset(unvaxcasefatalityratio, Age.group == "12-17")$Case.fatality.ratio, subset(vaxcasefatalityratio, Age.group == "12-17")$Case.fatality.ratio, paired=TRUE)
+```
+
+Other age groups were not normally distributed and were subjected to a Wilcox test. Each age group demonstrated statistically significant increases in CFRs for the unvaccinated compared to the vaccinated.
+
+**Are mortality rates different based on vaccination status within age groups?**
+
+Statistically significant differences in mortality rates exist based on vaccination status. The unvaccinated, at 9.6 deaths per 100,000 unvaccinated, have more than a 9 times higher death rate than the vaccinated.
+
+```{r CFR mortality vax status, echo=FALSE, warnings=FALSE}
+t.test(unvaxdeathrate$Deaths.per.100k, vaxdeathrate$Deaths.per.100k, paired=TRUE)
+```
+
+This relationship between vaccine status and mortality is significant across ages although the magnitude of the difference rapidly decreases with youth. The difference is less than one death per 100,000 between vaccinated and unvaccinated under 29. Deaths within both populations are concentrated among people over the age of 50.
+
+**Discussion and further analysis**
+
+Vaccination status is a clear determinant of COVID-19 mortality risk, whether measured as a death rate or case fatality ratio. But the typical risk faced by an American in 2021 from COVID-19 was smaller than that posed by motor vehicles or influenza in any given year, including for most of the unvaccinated population. 
+
+Vaccination protection was especially small for the youngest age group, mostly due to how small the risk is to this age. Similar could be said for age groups under 50: COVID wasn't a non-existent threat but the threat was not so big that vaccination alone could be said to have made a "dangerous" activity "safe." Still, to explain the relatively few deaths that happened among both vaccinated and unvaccinated populations more needs to be understood about the demographics and medical history of the dead.
+
+Age is clearly a determining factor in mortality risk for this and many other viral infections. For those over 50 vaccination in general brought safety to the at-risk. Even after vaccination the elderly were overrepresented among deaths. 
+
+Unfortunately the CDC did not provide vaccine product data segmented by age, future analysis with that data could determine if age interacts with vaccine product types to produce unstable case fatality ratios and mortality rates. There is currently evidence supporting higher rates of myocarditis from the mRNA vaccines in males under 40. With that knowledge sex identification would also illuminate more of the interactions that could exist with vaccination status and vaccine product type affecting case and death outcomes.
+
+Future analysis should look at patient data to determine what differentiates the fewer than one percent of the population who die from COVID-19 beyond age. While this analysis can demonstrate the protective effects of vaccination it is unable to clearly predict who is more likely to die, vaccinated or not.
+
+This analysis was conducted in R. You can find the backup code here: https://github.com/GMullings/covid

@@ -35,8 +35,10 @@ colnames(vaxdeathrate) = "Death.rate"
 vaxdeathrate$Vaccinated = "Yes"
 colnames(unvaxdeathrate) = "Death.rate"
 unvaxdeathrate$Vaccinated = "No"
-vaxdeathrate = cbind.data.frame(deaths,vaxdeathrate)
-unvaxdeathrate = cbind.data.frame(deaths,unvaxdeathrate)
+vaxdeathrate = cbind.data.frame(deaths[1:7],vaxdeathrate)
+colnames(vaxdeathrate) = c("outcome", "month", "MMWR.week", "Age.group", "Vaccine.product", "With.outcome", "Population", "Death.rate", "Vaccinated")
+unvaxdeathrate = cbind.data.frame(deaths[1:5],deaths[8:9],unvaxdeathrate)
+colnames(unvaxdeathrate) = c("outcome", "month", "MMWR.week", "Age.group", "Vaccine.product", "With.outcome", "Population", "Death.rate", "Vaccinated")
 deathsrate = rbind.data.frame(unvaxdeathrate,vaxdeathrate)
 colnames(cases)
 vaxcaserate = cases[6]/cases[7]
@@ -71,9 +73,20 @@ colnames(vaxcasefatalityratio) = c("month","MMWR.week","Age.group","Vaccine.prod
 deathsrate$Deaths.per.100k = deathsrate$Death.rate*100000
 caserate$Cases.per.100k = caserate$Case.rate*100000
 
+allagesvaxdeathrate = vaxdeathrate[vaxdeathrate$Age.group == "all_ages_adj",]
+alltypeagesvaxdeathrate = allagesvaxdeathrate[allagesvaxdeathrate$Vaccine.product == "all_types",]
+allagesunvaxdeathrate = unvaxdeathrate[unvaxdeathrate$Age.group == "all_ages_adj",]
+alltypeagesunvaxdeathrate = allagesunvaxdeathrate[allagesunvaxdeathrate$Vaccine.product == "all_types",]
+sum(alltypeagesvaxdeathrate$With.outcome, alltypeagesunvaxdeathrate$With.outcome)
+sum(alltypeagesvaxdeathrate$With.outcome)/sum(alltypeagesvaxdeathrate$With.outcome, alltypeagesunvaxdeathrate$With.outcome)
+
 # Plotting case fatality ratios for vaccines
 vaxtypecasefatalityratio = subset(vaxcasefatalityratio, Vaccine.product %in% c("Janssen","Moderna","Pfizer"))
 casefatalityratio = rbind.data.frame(unvaxcasefatalityratio, vaxcasefatalityratio)
+mean(casefatalityratio[casefatalityratio$Vaccinated == "Yes",]$Case.fatality.ratio)
+mean(casefatalityratio[casefatalityratio$Vaccinated == "No",]$Case.fatality.ratio)
+mean(casefatalityratio[casefatalityratio$Vaccinated == "No",]$Case.fatality.ratio)/mean(casefatalityratio[casefatalityratio$Vaccinated == "Yes",]$Case.fatality.ratio)
+
 graphcfr = casefatalityratio[casefatalityratio$Vaccine.product == "all_types",]
 
 v <- ggplot(vaxtypecasefatalityratio, aes(x=Vaccine.product,y=Case.fatality.ratio)) + geom_boxplot(varwidth=T, fill="plum") +
@@ -97,6 +110,7 @@ genfigure
 # Plotting Deaths per 100k for vaccines
 vaxdeathrate = deathsrate[deathsrate$Vaccinated == "Yes",]
 vaxdeathshundredtype = subset(vaxdeathrate, Vaccine.product %in% c("Janssen","Moderna","Pfizer"))
+
 
 v100k <- ggplot(vaxdeathshundredtype, aes(x=Vaccine.product,y=Deaths.per.100k)) + geom_boxplot(varwidth=T, fill="plum") +
   labs(title="Box plot of Vaccinated Deaths Per 100k",
@@ -208,10 +222,9 @@ ln4 <-ggplot(adjallagesd100k, aes(x=MMWR.week, y=Deaths.per.100k, group=Vaccinat
        x="MMWR Week",
        y="Deaths Per 100k")
 
-adjdeathsrate = as.data.frame((deaths[6]+deaths[8])/(deaths[7]+deaths[9]))
+adjdeathsrate = as.data.frame(deathsrate[6]/deathsrate[7])
 colnames(adjdeathsrate) = "Death.rate.allstatus"
-adjdeathsrate$Deaths.per.100k = adjdeathsrate$Death.rate.allstatus*100000
-adjdeathsrate = cbind.data.frame(deaths, adjdeathsrate)
+adjdeathsrate = cbind.data.frame(deathsrate, adjdeathsrate)
 
 ln5 <-ggplot(adjdeathsrate[adjdeathsrate$Vaccine.product == "all_types",], aes(x=MMWR.week, y=Deaths.per.100k, group=Age.group)) +
   geom_line(aes(linetype=Age.group, color=Age.group))+
@@ -295,6 +308,7 @@ t.test(subset(vaxdeathrate, Vaccine.product == "Pfizer")$Deaths.per.100k, subset
 
 # Are the vaccinated and unvaccinated statistically different on Deaths per 100k?
 unvaxdeathrate = deathsrate[deathsrate$Vaccinated == "No",]
+
 shapiro.test(vaxdeathrate$Deaths.per.100k)
 shapiro.test(unvaxdeathrate$Deaths.per.100k)
 shapiro.test(subset(vaxdeathrate, Age.group == "12-17")$Deaths.per.100k)
@@ -407,3 +421,8 @@ unvaxpie
 
 chisq.test(unvaxdeathagepie$deaths, unvaxpopprob) # The distribution of unvaccinated deaths were also skewed older, although not as much.
 
+mean(unvaxdeathrate$Deaths.per.100k)
+mean(vaxdeathrate$Deaths.per.100k)
+mean(subset(vaxdeathrate, Vaccine.product == "Janssen")$Deaths.per.100k)
+mean(subset(vaxdeathrate, Vaccine.product == "Moderna")$Deaths.per.100k)
+mean(subset(vaxdeathrate, Vaccine.product == "Pfizer")$Deaths.per.100k)
