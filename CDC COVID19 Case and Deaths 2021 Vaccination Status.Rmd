@@ -7,13 +7,13 @@ output: html_document
 
 **Executive Summary:**
 
-This analysis of CDC COVID-19 weekly cases and mortality data spans April - December, 2021. Vaccination status is a statistically significant determinant of mortality outcomes with COVID-19 with the unvaccinated showing consistently higher negative outcomes. This finding is robust to age although younger cohorts exhibit smaller and less statistically significant benefits from vaccination. The analysis pays particular attention to Case Fatality Ratios (CFRs) and Deaths per 100,000 between the vaccinated and unvaccinated as well as between the Moderna, J&J's Janssen, and Pfizer's vaccine products. CFRs are nearly 1.95x higher among the unvaccinated with both rates below 5%. Mortality rates are over 9x higher among the unvaccinated although for both groups COVID-19 poses less of a threat to their lives than either motor vehicle operation or Influenza. CFRs are higher among Moderna users versus other vaccine products while Deaths per 100,000 are higher among Janssen users. Graphs of critical measures over time are provided.
+This analysis of CDC COVID-19 weekly cases and mortality data spans April - December, 2021. Vaccination status is a statistically significant determinant of mortality outcomes with COVID-19 with the unvaccinated showing consistently higher negative outcomes. This finding is robust to age although the younger the cohort the smaller and less statistically significant the benefits from vaccination. The analysis pays particular attention to Case Fatality Ratios (CFRs) and Deaths per 100,000 between the vaccinated and unvaccinated as well as between the Moderna, J&J's Janssen, and Pfizer's vaccine products. CFRs are nearly 1.95x higher among the unvaccinated with both rates below 5%. Mortality rates are over 9x higher among the unvaccinated although for both groups COVID-19 poses less of a threat to their lives than either motor vehicle operation or Influenza. CFRs are higher among Moderna users versus other vaccine products while Deaths per 100,000 are higher among Janssen users. Graphs of critical measures over time are provided.
 
 **Intro:**
 
-Since COVID-19 was publicly discovered in late December 2019 illness severity and death risks from the virus have been clearly segmented by age, with the oldest more likely to suffer and die from infection. Since March 2020 data from the CDC on patient conditions suggested that pre-existing conditions status and quantity also defined risk profiles. After the emergence of COVID-19 vaccines in 2021 a person's vaccination status has a demonstrable impact on mortality risks. 
+Since COVID-19 was publicly discovered in late December 2019 illness severity and death risks from the virus [have been clearly segmented by age](https://www.cdc.gov/coronavirus/2019-ncov/covid-data/investigations-discovery/hospitalization-death-by-age.html), with the oldest more likely to be hospitalized and die from infection. Since March 2020 data from the CDC on patient conditions suggested that [pre-existing conditions status and quantity](https://www.cdc.gov/pcd/issues/2021/21_0123.htm) also determined the probability of illness severe enough to require hospitalization. After the emergence of COVID-19 vaccines in 2021 a person's [vaccination status seemed to have a demonstrable impact on mortality risks](https://covid.cdc.gov/covid-data-tracker/#rates-by-vaccine-status). 
 
-The CDC publishes weekly data on cases and deaths in 2021 with data starting in April, every month. The data segments both cases and deaths by vaccination status, vaccine product type (Janssen, Moderna, Pfizer, or all), and age bracket (12-17, 18-29, 30-49, 50-64, 65-79, 80+, or all adjusted). In light of what is known about COVID-19's risk profile this data offers insight into who is disproportionately suffering from symptomatic infection and death along age and vaccination deliniations.
+The CDC [publishes weekly data on cases and deaths](https://data.cdc.gov/Public-Health-Surveillance/Rates-of-COVID-19-Cases-or-Deaths-by-Age-Group-and/3rge-nu2a) in 2021 with data starting in April, every month. The data segments both cases and deaths by vaccination status, vaccine product type (Janssen, Moderna, Pfizer, or all), and age bracket (12-17, 18-29, 30-49, 50-64, 65-79, 80+, or all adjusted). In light of what is known about COVID-19's risk profile this data offers insight into who is disproportionately suffering from symptomatic infection and death along age and vaccination deliniations.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(warning = FALSE, message = FALSE) # Turns off warning messages
@@ -133,7 +133,7 @@ vaxpopdist = data.frame(Population=c(da,da1,da2,da3,da4,da5), ages= c("12-17","1
 
 **Data Exploration**
 
-According to the University of North Carolina's Gillings School of Global Public Health the Case Fatality Ratio is the, "proportion of people recorded as confirmed COVID-19 cases who die from COVID-19." It can, "be approximated by dividing the number of deaths by the number of confirmed cases." CFRs are commonly used to measure the lethality of acute infectious disease, which at this point seems to be an appropriate description of COVID-19.
+According to the [University of North Carolina's Gillings School of Global Public Health](https://gillingscovid19.unc.edu/definitions/case-fatality-ratio) the Case Fatality Ratio is the, "proportion of people recorded as confirmed COVID-19 cases who die from COVID-19." It can, "be approximated by dividing the number of deaths by the number of confirmed cases." CFRs are commonly used to measure the lethality of acute infectious disease, which at this point seems to be an appropriate description of COVID-19.
 
 The following are boxplots of Case Fatality Ratios for 2021 COVID-19 CDC data starting with MMWR Week 14, the first week of April. The top graph plots CFRs by vaccine product (categories include "Janssen" fro J&J, "Moderna," and "Pfizer") and the bottom graph plots CFRs by vaccination status and age.
 
@@ -158,7 +158,7 @@ u
 v
 ```
 
-The below are similar breakdowns of the weekly CFRs from April - December of 2021. Also included are weekly cases per 100,000 for the same time period. For reference 1,000 cases would be equivalent to a 1% weekly case rate.
+The below are similar breakdowns of the weekly CFRs from April - December of 2021. Also included are weekly cases per 100,000 for the same time period. For reference 1,000 cases would be equivalent to a 1% weekly case rate. Notably Moderna's CFRs remain elevated above all other vaccines for most of the year.
 
 ```{r CFRs time, echo=FALSE, warnings=FALSE}
 ln <-ggplot(allagescfr[allagescfr$Vaccinated == "Yes",], aes(x=MMWR.week, y=Case.fatality.ratio, group=Vaccine.product)) +
@@ -215,11 +215,11 @@ ln6
 ln7
 ```
 
-Deaths per 100,000 is a practical way to express the raw mortality rate of a disease. Mortality rates normalize comparisons of death between groups by controlling for the difference between the size of the populations. Because of the low digits typically associated with measuring particular disease mortality in large populations, a figure like 100,000 is used as the base population comparison. For reference, 1000 deaths per 100,000 would be equivalent to a 1% death rate. As practical references according to the CDC in 2020 there were 14.7 deaths per 100,000 Americans from motor vehicle traffic with an annual average rate of 14 between 2015 and 2020, and Influenza and Pneumonia had a rate of 19.8 in 2020 with an average of 20.4 between 2015 and 2020.
+Deaths per 100,000 is a practical way to express the raw mortality rate of a disease. Mortality rates normalize comparisons of lethality between groups by controlling for the difference between the size of the populations exposed. Because of the low digits typically associated with measuring particular disease mortality in large populations a figure like 100,000 is used as the base population comparison. For reference, 1000 deaths per 100,000 would be equivalent to a 1% death rate. As practical references according to the CDC in 2020 there were 14.7 deaths per 100,000 Americans from motor vehicle traffic with an annual average rate of 14 between 2015 and 2020, and Influenza and Pneumonia had a rate of 19.8 in 2020 with an average of 20.4 between 2015 and 2020.
 
-Of the 124,406 killed by COVID-19 in 2021 since vaccination-status tracking by the CDC (according to the CDC as of Jan 21, 2022) just over 19% were vaccinated. The death rate for COVID-19 is arguably the most cited statistic in discussing vaccination status. In this case the death rate is calculated by vaccination status population. In other words the death rate for vaccinated observations is the number of vaccinated deaths divded by the number of vaccinated Americans.
+Of the 124,406 killed by COVID-19 in 2021 since vaccination-status tracking by the CDC (according to the CDC as of Jan 21, 2022) just over 19% were vaccinated. The death rate for COVID-19 is arguably the most cited statistic in discussing vaccination status. In this case the death rate is calculated by vaccination status population: the death rate for vaccinated observations is the number of vaccinated deaths divded by the number of vaccinated Americans.
 
-The following are boxplots of Deaths Per 100,000 for most of 2021 (minus the last three weeks) COVID-19 CDC data starting with MMWR Week 14, the first week of April. The top graph plots death rates by vaccine product (categories include "Janssen" fro J&J, "Moderna," and "Pfizer") and the bottom graph plots death rates by vaccination status and age.
+The following are boxplots of Deaths Per 100,000 for most of 2021 (minus the last three weeks) COVID-19 CDC data starting with MMWR Week 14, the first week of April. The top graph plots death rates by vaccine product (categories include "Janssen" from J&J, "Moderna," and "Pfizer") and the bottom graph plots death rates by vaccination status and age.
 
 ```{r deathrates, echo=FALSE}
 v100k <- ggplot(vaxdeathshundredtype, aes(x=Vaccine.product,y=Deaths.per.100k)) + geom_boxplot(varwidth=T, fill="plum") +
@@ -290,14 +290,14 @@ ln5
 
 **Are Case Fatality Ratios stable between vaccine products?**
 
-Differences in Case Fatality Ratios between vaccine products are important to discerning the effectiveness of any given vaccine product. The CFR distribution visually differs between vaccines. Because most of the CFRs are not normally distributed within vaccine types a Wilcox test was conducted to test for statistically significant differences between vaccine types. The results are provided below:
+Differences in Case Fatality Ratios between vaccine products are important to discerning the effectiveness of any given vaccine product. The CFR distribution from the boxplot in the prior section visually differs between vaccines. Because most of the CFRs are not normally distributed within vaccine types Wilcox tests were conducted to test for statistically significant differences between vaccine types. The results are provided below:
 
 ```{r CFR vaccine product stability Janssen vs Pfizer, echo=FALSE, warnings=FALSE}
 
 wilcox.test(jajcfr$Case.fatality.ratio, pfizercfr$Case.fatality.ratio, paired=TRUE)
 ```
 
-A Wilcox test is used due to abnormal CFR distributions. The reults support that J&J's Janssen and Pfizer's vaccines have statistically similar CFRs.
+The reults support that J&J's Janssen and Pfizer's vaccines have statistically similar CFRs.
 
 ```{r CFR vaccine product stability Moderna vs Pfizer, echo=FALSE, warnings=FALSE}
 wilcox.test(mdrnacfr$Case.fatality.ratio, pfizercfr$Case.fatality.ratio, paired=TRUE) # Low p-value indicates significant difference. Moderna and Pfizer's CFRs are significantly different
@@ -330,15 +330,15 @@ Janssen has an almost 70% higher death rate than the mRNA vaccines which have ab
 
 **Are Case Fatality Ratios different based on vaccination status within age groups?**
 
-There are clear differences over time between CFRs based on vaccination status. Average case fatality ratios in the dataset were nearly twice as high for the unvaccinated who averaged 3.5%. What isn't as clear visually is whether there are differences between every age group, and particularly below 50.
+There are clear differences over time between CFRs based on vaccination status. Average case fatality ratios in the dataset were nearly twice as high for the unvaccinated who averaged 3.5%. What isn't as clear visually is whether there are differences in CFRs between every age group, and particularly those below 50.
 
-The difference between vaccinated and unvaccinated CFRs is statistically significant. 
+The difference between vaccinated and unvaccinated CFRs is statistically significant, the results are below. 
 
 ```{r CFR vaccinated vs unvaccinated, echo=FALSE, warnings=FALSE}
 t.test(unvaxcasefatalityratio$Case.fatality.ratio, vaxcasefatalityratio$Case.fatality.ratio, paired=TRUE)
 ```
 
-So is the difference among 12-17 year olds, with the unvaccinated having higher CFRs, below. The average difference between the CFRs of vaccinated and unvaccinated in this age group though is less than 1% of the difference between the total vaccinated and unvaccinated population though.
+So is the difference among 12-17 year olds, with the unvaccinated teen having higher CFRs (results below). The average difference between the CFRs of vaccinated and unvaccinated in this age group though is less than 1% of the difference between the total vaccinated and unvaccinated population though.
 
 ```{r CFR 12-17, echo=FALSE, warnings=FALSE}
 t.test(subset(unvaxcasefatalityratio, Age.group == "12-17")$Case.fatality.ratio, subset(vaxcasefatalityratio, Age.group == "12-17")$Case.fatality.ratio, paired=TRUE)
@@ -360,12 +360,14 @@ This relationship between vaccine status and mortality is significant across age
 
 Vaccination status is a clear determinant of COVID-19 mortality risk, whether measured as a death rate or case fatality ratio. But the typical risk faced by an American in 2021 from COVID-19 was smaller than that posed by motor vehicles or influenza in any given year, including for most of the unvaccinated population. 
 
-Vaccination protection was especially small for the youngest age group, mostly due to how small the risk is to this age. Similar could be said for age groups under 50: COVID wasn't a non-existent threat but the threat was not so big that vaccination alone could be said to have made a "dangerous" activity "safe." Still, to explain the relatively few deaths that happened among both vaccinated and unvaccinated populations more needs to be understood about the demographics and medical history of the dead.
+Vaccination protection was especially small for the youngest age group, mostly due to how small the risk is to this age.To a modestly lesser extent similar could be said for age groups under 50: COVID wasn't a non-existent threat in 2021 but the threat was not so lethal or widespread that vaccination alone could be said to have made a "dangerous" activity "safe." Still, to explain the relatively few deaths that happened among both vaccinated and unvaccinated populations more needs to be understood about the demographics and medical history of those sick enough to require hospitalization.
 
-Age is clearly a determining factor in mortality risk for this and many other viral infections. For those over 50 vaccination in general brought safety to the at-risk. Even after vaccination the elderly were overrepresented among deaths. 
+Age is clearly a determining factor in mortality risk for this and many other viral infections. For those over 50 vaccination in general brought safety to the at-risk. Further, COVID-19 was so dangerous for the elderly that they were overrepresented among deaths even after vaccination. 
 
-Unfortunately the CDC did not provide vaccine product data segmented by age, future analysis with that data could determine if age interacts with vaccine product types to produce unstable case fatality ratios and mortality rates. There is currently evidence supporting higher rates of myocarditis from the mRNA vaccines in males under 40. With that knowledge sex identification would also illuminate more of the interactions that could exist with vaccination status and vaccine product type affecting case and death outcomes.
+Unfortunately the CDC did not provide vaccine product data segmented by age, future analysis with that data could determine if age interacts with vaccine product types to produce unstable case fatality ratios or mortality rates. There is [evidence supporting higher rates of myocarditis from the mRNA vaccines in males under 40](https://vinayprasadmdmph.substack.com/p/uk-now-reports-myocarditis-stratified). It is possible that the higher CFR associated with the Moderna vaccine in the US could be connected to observations from that UK study. Sex identification would illuminate more about the interactions that could exist with vaccination status or vaccine product type affecting CFRs and mortality outcomes.
+
+Cases in this analysis should be assumed to be wrong and likely to be higher in the real world population. Cases are likely distributed on the basis of case severity with severe infections more likely to trigger test-seeking behavio and case confirmation. As such these CFRs should be assumed inflated compared to the real world.
 
 Future analysis should look at patient data to determine what differentiates the fewer than one percent of the population who die from COVID-19 beyond age. While this analysis can demonstrate the protective effects of vaccination it is unable to clearly predict who is more likely to die, vaccinated or not.
 
-This analysis was conducted in R. You can find the backup code here: https://github.com/GMullings/covid
+This analysis was conducted in R. You can find the backup code [here, on my GitHub](https://github.com/GMullings/covid).
